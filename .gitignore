@@ -210,7 +210,7 @@ __marimo__/
 # Generated WebAssembly files
 *.wasm
 # Generated JavaScript bindings from emcc
-wasm/*.js
+simple_build_example/*.js
 # Emscripten cache
 .emscripten_cache/
 # Emscripten temporary files
