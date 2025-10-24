@@ -33,10 +33,12 @@ cmake --build .
 ## Generated Files
 
 The build process generates:
-- `math.js` - JavaScript module
-- `math.wasm` - WebAssembly binary
+- `mod.js` - JavaScript module
+- `mod.wasm` - WebAssembly binary
 
 ## Exported Functions
+
+ToDo - update this to reflect AoC functions
 
 The library exports the following functions:
 - `add(a, b)` - Addition
