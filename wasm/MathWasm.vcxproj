@@ -148,6 +148,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mod.h" />
+    <ClInclude Include="src\day00.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="CMakeLists.txt" />

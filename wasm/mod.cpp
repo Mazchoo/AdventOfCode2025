@@ -5,11 +5,13 @@
 #define EXPORT_FUNC
 #endif
 
+#include "src/day00.hpp"
+
 extern "C" {
     // Simple addition function
     EXPORT_FUNC
     int add(int a, int b) {
-        return a + b;
+        return day00::add(a, b);
     }
     
     // Simple multiplication function

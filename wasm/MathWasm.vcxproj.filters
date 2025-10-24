@@ -19,6 +19,9 @@
     <Filter Include="WASM Files">
       <UniqueIdentifier>{f2a1b3c4-5d6e-7f8a-9b0c-1d2e3f4a5b6c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\src">
+      <UniqueIdentifier>{d522fc2b-1b83-4ef0-b250-e95cbc78a396}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -31,6 +34,9 @@
   <ItemGroup>
     <ClInclude Include="mod.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\day00.hpp">
+      <Filter>Source Files\src</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

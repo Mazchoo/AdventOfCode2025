@@ -11,7 +11,7 @@ if(NOT EMSCRIPTEN)
 endif()
 
 # Define the executable
-add_executable(mod mod.cpp)
+add_executable(mod mod.cpp src/day00.hpp)
 
 # Set emscripten-specific flags
 set_target_properties(mod PROPERTIES
