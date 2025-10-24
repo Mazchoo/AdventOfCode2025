@@ -1,6 +1,6 @@
 #include <iostream>
 #include <iomanip>
-#include "math.h"
+#include "mod.h"
 
 // Main function for testing and debugging the math functions natively
 int main() {

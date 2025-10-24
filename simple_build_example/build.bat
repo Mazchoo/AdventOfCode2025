@@ -2,7 +2,7 @@
 echo Building C++ to WebAssembly...
 
 REM Compile with emscripten
-emcc math.cpp ^
+emcc mod.cpp ^
   -o math.js ^
   -s EXPORTED_FUNCTIONS="['_add', '_multiply', '_factorial', '_power']" ^
   -s EXPORTED_RUNTIME_METHODS="['ccall', 'cwrap']" ^
