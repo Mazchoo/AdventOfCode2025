@@ -50,7 +50,7 @@ The library exports the following functions:
 
 ```javascript
 // Load the module
-import MathModule from './math.js';
+import MathModule from './mod.js';
 
 MathModule().then(Module => {
     // Use the exported functions
