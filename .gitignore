@@ -205,3 +205,14 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# WebAssembly / Emscripten
+# Generated WebAssembly files
+*.wasm
+# Generated JavaScript bindings from emcc
+wasm/*.js
+# Emscripten cache
+.emscripten_cache/
+# Emscripten temporary files
+a.out.js
+a.out.wasm
