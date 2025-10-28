@@ -12,7 +12,7 @@ if(NOT EMSCRIPTEN)
 endif()
 
 # Define the executable
-add_executable(mod ../cpp_src/mod.cpp ../cpp_src/src/day00.hpp)
+add_executable(mod ../cpp_src/mod.cpp)
 
 # Add include directory for headers
 target_include_directories(mod PRIVATE ../cpp_src)
