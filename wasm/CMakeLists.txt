@@ -16,13 +16,13 @@ add_executable(mod ../cpp_src/mod.cpp)
 # Add include directory for headers
 target_include_directories(mod PRIVATE ../cpp_src)
 
-# Set emscripten-specific flags
+# Set emscripten-specific flags for WASM
 set_target_properties(mod PROPERTIES
-    SUFFIX ".js"
-    LINK_FLAGS "-s EXPORTED_FUNCTIONS=['_add','_multiply','_factorial','_power'] -s EXPORTED_RUNTIME_METHODS=['ccall','cwrap'] -s MODULARIZE=1 -s EXPORT_NAME=MathModule -s ENVIRONMENT=web -s ALLOW_MEMORY_GROWTH=1 -O3"
+    SUFFIX ".wasm"
+    LINK_FLAGS "-s WASM=1 -s ALLOW_MEMORY_GROWTH=1 -s EXPORT_ALL=1 --no-entry -O3"
 )
 
-# Output files will be mod.js and math.wasm
+# Output file will be mod.wasm
 set_target_properties(mod PROPERTIES
     OUTPUT_NAME "mod"
 )
@@ -31,7 +31,6 @@ set_target_properties(mod PROPERTIES
 add_custom_command(TARGET mod POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E echo "Build successful!"
     COMMAND ${CMAKE_COMMAND} -E echo "Generated files:"
-    COMMAND ${CMAKE_COMMAND} -E echo "  - mod.js"
     COMMAND ${CMAKE_COMMAND} -E echo "  - mod.wasm"
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 )
