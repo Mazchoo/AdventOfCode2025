@@ -151,10 +151,10 @@
     <ClInclude Include="src\day00.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="CMakeLists.txt" />
-    <None Include="README.md" />
-    <None Include="build-cmake.bat" />
-    <None Include="generate_cmake_lists.py" />
+    <None Include="..\wasm\CMakeLists.txt" />
+    <None Include="..\wasm\README.md" />
+    <None Include="..\wasm\build-cmake.bat" />
+    <None Include="..\wasm\generate_cmake_lists.py" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -20,6 +20,9 @@ endif()
 # Define the executable
 add_executable(mod {sources_str})
 
+# Add include directory for headers
+target_include_directories(mod PRIVATE ../cpp_src)
+
 # Set emscripten-specific flags
 set_target_properties(mod PROPERTIES
     SUFFIX ".js"
@@ -41,7 +44,7 @@ add_custom_command(TARGET mod POST_BUILD
 )"""
 
 
-def find_source_files(src_dir: str) -> List[str]:
+def find_source_files(src_dir: str, wasm_dir: str) -> List[str]:
     """Find all .cpp, .h, and .hpp files in the src directory."""
     source_files = []
     extensions = {".cpp", ".h", ".hpp"}
@@ -52,9 +55,9 @@ def find_source_files(src_dir: str) -> List[str]:
     for root, dirs, files in os.walk(src_dir):
         for file in files:
             if any(file.endswith(ext) for ext in extensions):
-                # Get relative path from wasm directory
+                # Get relative path from wasm directory to cpp_src
                 rel_path = os.path.relpath(
-                    os.path.join(root, file), os.path.dirname(src_dir)
+                    os.path.join(root, file), wasm_dir
                 )
                 source_files.append(
                     rel_path.replace("\\", "/")
@@ -87,16 +90,18 @@ def extract_exported_functions(mod_cpp_path: str) -> List[str]:
 def generate_cmake_lists(wasm_dir: str = "wasm") -> str:
     """Generate CMakeLists.txt content."""
 
-    # Paths
-    mod_cpp_path = os.path.join(wasm_dir, "mod.cpp")
-    src_dir = os.path.join(wasm_dir, "src")
+    # Paths - now reference cpp_src directory
+    cpp_src_dir = os.path.join(os.path.dirname(wasm_dir), "cpp_src")
+    mod_cpp_path = os.path.join(cpp_src_dir, "mod.cpp")
+    src_dir = os.path.join(cpp_src_dir, "src")
 
     # Get source files and exported functions
-    source_files = find_source_files(src_dir)
+    source_files = find_source_files(src_dir, wasm_dir)
     exported_functions = extract_exported_functions(mod_cpp_path)
 
-    # Build the source file list for add_executable
-    all_sources = ["mod.cpp"] + source_files
+    # Build the source file list for add_executable with relative paths from wasm dir
+    mod_cpp_rel = os.path.relpath(mod_cpp_path, wasm_dir).replace("\\", "/")
+    all_sources = [mod_cpp_rel] + source_files
     sources_str = " ".join(all_sources)
 
     # Build exported functions string
@@ -128,9 +133,10 @@ def write_cmake_lists(wasm_dir: str = "wasm", output_path: Optional[str] = None)
     print(f"Generated CMakeLists.txt at: {output_path}")
 
     # Print summary
-    mod_cpp_path = os.path.join(wasm_dir, "mod.cpp")
-    src_dir = os.path.join(wasm_dir, "src")
-    source_files = find_source_files(src_dir)
+    cpp_src_dir = os.path.join(os.path.dirname(wasm_dir), "cpp_src")
+    mod_cpp_path = os.path.join(cpp_src_dir, "mod.cpp")
+    src_dir = os.path.join(cpp_src_dir, "src")
+    source_files = find_source_files(src_dir, wasm_dir)
     exported_functions = extract_exported_functions(mod_cpp_path)
 
     print(f"Found {len(source_files)} source files in src/:")

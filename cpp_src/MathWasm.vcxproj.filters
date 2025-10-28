@@ -40,16 +40,16 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="CMakeLists.txt">
+    <None Include="..\wasm\CMakeLists.txt">
       <Filter>Build Files</Filter>
     </None>
-    <None Include="README.md">
+    <None Include="..\wasm\README.md">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="build-cmake.bat">
+    <None Include="..\wasm\build-cmake.bat">
       <Filter>Build Files</Filter>
     </None>
-    <None Include="generate_cmake_lists.py">
+    <None Include="..\wasm\generate_cmake_lists.py">
       <Filter>Build Files</Filter>
     </None>
   </ItemGroup>

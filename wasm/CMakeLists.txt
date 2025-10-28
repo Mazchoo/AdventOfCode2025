@@ -1,4 +1,3 @@
-
 cmake_minimum_required(VERSION 3.16)
 project(MathWasm)
 
@@ -12,7 +11,10 @@ if(NOT EMSCRIPTEN)
 endif()
 
 # Define the executable
-add_executable(mod mod.cpp src/day00.hpp)
+add_executable(mod ../cpp_src/mod.cpp)
+
+# Add include directory for headers
+target_include_directories(mod PRIVATE ../cpp_src)
 
 # Set emscripten-specific flags
 set_target_properties(mod PROPERTIES
