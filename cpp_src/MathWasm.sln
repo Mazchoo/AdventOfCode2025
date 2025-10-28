@@ -1,30 +1,47 @@
+﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.0.31903.59
-MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MathWasm", "MathWasm.vcxproj", "{A7F4F3C2-9B8D-4E1A-8F2C-3D4E5F6A7B8C}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CMakePredefinedTargets", "CMakePredefinedTargets", "{B8D6B8A0-D113-3CE3-9144-D910D9B85DE9}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MathWasm", "MathWasm.vcxproj", "{CAAA9E4B-0538-33D1-98DA-B60C532FC4E8}"
+	ProjectSection(ProjectDependencies) = postProject
+		{9F0B1056-AEAF-3D4A-AF19-6C81F183341B} = {9F0B1056-AEAF-3D4A-AF19-6C81F183341B}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ALL_BUILD", "ALL_BUILD.vcxproj", "{C56D1B7F-73E1-363F-84E3-08843440A7B3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{CAAA9E4B-0538-33D1-98DA-B60C532FC4E8} = {CAAA9E4B-0538-33D1-98DA-B60C532FC4E8}
+		{9F0B1056-AEAF-3D4A-AF19-6C81F183341B} = {9F0B1056-AEAF-3D4A-AF19-6C81F183341B}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ZERO_CHECK", "ZERO_CHECK.vcxproj", "{9F0B1056-AEAF-3D4A-AF19-6C81F183341B}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
-		Debug|x86 = Debug|x86
 		Release|x64 = Release|x64
-		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{A7F4F3C2-9B8D-4E1A-8F2C-3D4E5F6A7B8C}.Debug|x64.ActiveCfg = Debug|x64
-		{A7F4F3C2-9B8D-4E1A-8F2C-3D4E5F6A7B8C}.Debug|x64.Build.0 = Debug|x64
-		{A7F4F3C2-9B8D-4E1A-8F2C-3D4E5F6A7B8C}.Debug|x86.ActiveCfg = Debug|Win32
-		{A7F4F3C2-9B8D-4E1A-8F2C-3D4E5F6A7B8C}.Debug|x86.Build.0 = Debug|Win32
-		{A7F4F3C2-9B8D-4E1A-8F2C-3D4E5F6A7B8C}.Release|x64.ActiveCfg = Release|x64
-		{A7F4F3C2-9B8D-4E1A-8F2C-3D4E5F6A7B8C}.Release|x64.Build.0 = Release|x64
-		{A7F4F3C2-9B8D-4E1A-8F2C-3D4E5F6A7B8C}.Release|x86.ActiveCfg = Release|Win32
-		{A7F4F3C2-9B8D-4E1A-8F2C-3D4E5F6A7B8C}.Release|x86.Build.0 = Release|Win32
+		{CAAA9E4B-0538-33D1-98DA-B60C532FC4E8}.Debug|x64.ActiveCfg = Debug|x64
+		{CAAA9E4B-0538-33D1-98DA-B60C532FC4E8}.Debug|x64.Build.0 = Debug|x64
+		{CAAA9E4B-0538-33D1-98DA-B60C532FC4E8}.Release|x64.ActiveCfg = Release|x64
+		{CAAA9E4B-0538-33D1-98DA-B60C532FC4E8}.Release|x64.Build.0 = Release|x64
+		{C56D1B7F-73E1-363F-84E3-08843440A7B3}.Debug|x64.ActiveCfg = Debug|x64
+		{C56D1B7F-73E1-363F-84E3-08843440A7B3}.Release|x64.ActiveCfg = Release|x64
+		{9F0B1056-AEAF-3D4A-AF19-6C81F183341B}.Debug|x64.ActiveCfg = Debug|x64
+		{9F0B1056-AEAF-3D4A-AF19-6C81F183341B}.Debug|x64.Build.0 = Debug|x64
+		{9F0B1056-AEAF-3D4A-AF19-6C81F183341B}.Release|x64.ActiveCfg = Release|x64
+		{9F0B1056-AEAF-3D4A-AF19-6C81F183341B}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
+	GlobalSection(NestedProjects) = preSolution
+		{C56D1B7F-73E1-363F-84E3-08843440A7B3} = {B8D6B8A0-D113-3CE3-9144-D910D9B85DE9}
+		{9F0B1056-AEAF-3D4A-AF19-6C81F183341B} = {B8D6B8A0-D113-3CE3-9144-D910D9B85DE9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {12345678-1234-5678-9ABC-DEF123456789}
+		SolutionGuid = {7082E055-53F8-3B37-84B2-0329B7D02BFB}
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
 	EndGlobalSection
 EndGlobal

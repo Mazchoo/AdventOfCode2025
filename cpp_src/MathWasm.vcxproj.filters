@@ -1,56 +1,21 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
-    <Filter Include="Build Files">
-      <UniqueIdentifier>{8b1d8a56-2c4e-4f89-9d1b-3a5e7f2c8b4d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="WASM Files">
-      <UniqueIdentifier>{f2a1b3c4-5d6e-7f8a-9b0c-1d2e3f4a5b6c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\src">
-      <UniqueIdentifier>{d522fc2b-1b83-4ef0-b250-e95cbc78a396}</UniqueIdentifier>
-    </Filter>
+    <ClCompile Include="D:\Development\AdventOfCode2025\cpp_src\main.cpp" />
+    <ClCompile Include="D:\Development\AdventOfCode2025\cpp_src\mod.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="mod.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="mod.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\day00.hpp">
-      <Filter>Source Files\src</Filter>
+    <ClInclude Include="D:\Development\AdventOfCode2025\cpp_src\mod.h" />
+    <ClInclude Include="D:\Development\AdventOfCode2025\cpp_src\src\day00.hpp">
+      <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\wasm\CMakeLists.txt">
-      <Filter>Build Files</Filter>
-    </None>
-    <None Include="..\wasm\README.md">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="..\wasm\build-cmake.bat">
-      <Filter>Build Files</Filter>
-    </None>
-    <None Include="..\wasm\generate_cmake_lists.py">
-      <Filter>Build Files</Filter>
-    </None>
+    <CustomBuild Include="D:\Development\AdventOfCode2025\cpp_src\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{FE84BB1F-45F6-3AA6-A36F-8CDA842AEE21}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>
