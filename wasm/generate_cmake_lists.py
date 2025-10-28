@@ -23,13 +23,13 @@ add_executable(mod {sources_str})
 # Add include directory for headers
 target_include_directories(mod PRIVATE ../cpp_src)
 
-# Set emscripten-specific flags
+# Set emscripten-specific flags for WASM
 set_target_properties(mod PROPERTIES
-    SUFFIX ".js"
-    LINK_FLAGS "{link_flags}"
+    SUFFIX ".wasm"
+    LINK_FLAGS "-s WASM=1 -s ALLOW_MEMORY_GROWTH=1 -s EXPORT_ALL=1 --no-entry -O3"
 )
 
-# Output files will be mod.js and math.wasm
+# Output file will be mod.wasm
 set_target_properties(mod PROPERTIES
     OUTPUT_NAME "mod"
 )
@@ -38,7 +38,6 @@ set_target_properties(mod PROPERTIES
 add_custom_command(TARGET mod POST_BUILD
     COMMAND ${{CMAKE_COMMAND}} -E echo "Build successful!"
     COMMAND ${{CMAKE_COMMAND}} -E echo "Generated files:"
-    COMMAND ${{CMAKE_COMMAND}} -E echo "  - mod.js"
     COMMAND ${{CMAKE_COMMAND}} -E echo "  - mod.wasm"
     WORKING_DIRECTORY ${{CMAKE_CURRENT_BINARY_DIR}}
 )"""
@@ -95,29 +94,15 @@ def generate_cmake_lists(wasm_dir: str = "wasm") -> str:
     mod_cpp_path = os.path.join(cpp_src_dir, "mod.cpp")
     src_dir = os.path.join(cpp_src_dir, "src")
 
-    # Get source files and exported functions
+    # Get source files (exported functions no longer needed with EXPORT_ALL=1)
     source_files = find_source_files(src_dir, wasm_dir)
-    exported_functions = extract_exported_functions(mod_cpp_path)
 
     # Build the source file list for add_executable with relative paths from wasm dir
     mod_cpp_rel = os.path.relpath(mod_cpp_path, wasm_dir).replace("\\", "/")
     all_sources = [mod_cpp_rel] + source_files
     sources_str = " ".join(all_sources)
 
-    # Build exported functions string
-    exported_funcs_str = (
-        "[" + ",".join(exported_functions) + "]" if exported_functions else "[]"
-    )
-
-    # Build link flags to avoid long lines
-    link_flags = (
-        f"-s EXPORTED_FUNCTIONS={exported_funcs_str} "
-        "-s EXPORTED_RUNTIME_METHODS=['ccall','cwrap'] "
-        "-s MODULARIZE=1 -s EXPORT_NAME=MathModule "
-        "-s ENVIRONMENT=web -s ALLOW_MEMORY_GROWTH=1 -O3"
-    )
-
-    return CMAKE_TEMPLATE.format(sources_str=sources_str, link_flags=link_flags)
+    return CMAKE_TEMPLATE.format(sources_str=sources_str)
 
 
 def write_cmake_lists(wasm_dir: str = "wasm", output_path: Optional[str] = None):
