@@ -13,7 +13,7 @@ import pytest
 from src.common.wasm_handle import load_wasm_module
 
 
-STORE, INSTANCE = load_wasm_module("./wasm/build/mod.wasm")
+STORE, INSTANCE = load_wasm_module("./emcc_wasm/build/mod.wasm")
 
 
 def test_add_function():
