@@ -104,4 +104,37 @@ extern "C" {
     float get_array_element(float* ptr, int index) {
         return day00::get_array_element(ptr, index);
     }
+    
+    // Raw byte array functions for WASM bindings (uint8_t operations)
+    
+    // Creates a new byte array of specified size
+    EXPORT_FUNC
+    uint8_t* create_byte_array(int size) {
+        return day00::create_byte_array(size);
+    }
+    
+    // Frees memory allocated for a byte array
+    EXPORT_FUNC
+    void free_byte_array(uint8_t* ptr) {
+        day00::free_byte_array(ptr);
+    }
+    
+    // Sums all elements in a byte array (returns int to avoid overflow)
+    EXPORT_FUNC
+    int sum_byte_array(uint8_t* ptr, int size) {
+        return day00::sum_byte_array(ptr, size);
+    }
+    
+    // Sets a value at specified index in byte array
+    // Returns 1 for success, 0 for failure
+    EXPORT_FUNC
+    int set_byte_array_element(uint8_t* ptr, int index, uint8_t value) {
+        return day00::set_byte_array_element(ptr, index, value) ? 1 : 0;
+    }
+    
+    // Gets a value at specified index in byte array
+    EXPORT_FUNC
+    uint8_t get_byte_array_element(uint8_t* ptr, int index) {
+        return day00::get_byte_array_element(ptr, index);
+    }
 }

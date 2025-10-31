@@ -1,4 +1,5 @@
 #include <cstddef>
+#include <cstdint>
 
 namespace day00
 {
@@ -151,6 +152,54 @@ namespace day00
     float get_array_element(float* ptr, int index) {
         if (ptr == nullptr || index < 0) {
             return 0.0f;
+        }
+        return ptr[index];
+    }
+    
+    // Byte array versions for uint8_t operations
+    
+    // Creates a raw uint8_t array of specified size, initialized to zero
+    uint8_t* create_byte_array(int size) {
+        if (size <= 0) {
+            return nullptr;
+        }
+        uint8_t* array = new uint8_t[size]();  // () initializes to zero
+        return array;
+    }
+    
+    // Frees memory allocated for a raw uint8_t array
+    void free_byte_array(uint8_t* ptr) {
+        if (ptr != nullptr) {
+            delete[] ptr;
+        }
+    }
+    
+    // Sums all elements in a raw uint8_t array (returns int to avoid overflow)
+    int sum_byte_array(uint8_t* ptr, int size) {
+        if (ptr == nullptr || size <= 0) {
+            return 0;
+        }
+        
+        int sum = 0;
+        for (int i = 0; i < size; i++) {
+            sum += ptr[i];
+        }
+        return sum;
+    }
+    
+    // Sets a value at specified index in raw uint8_t array
+    bool set_byte_array_element(uint8_t* ptr, int index, uint8_t value) {
+        if (ptr == nullptr || index < 0) {
+            return false;
+        }
+        ptr[index] = value;
+        return true;
+    }
+    
+    // Gets a value at specified index in raw uint8_t array
+    uint8_t get_byte_array_element(uint8_t* ptr, int index) {
+        if (ptr == nullptr || index < 0) {
+            return 0;
         }
         return ptr[index];
     }

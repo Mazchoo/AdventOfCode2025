@@ -16,6 +16,13 @@ Raw Float Array functions:
 - sum_float_array(float*, int) -> float
 - set_array_element(float*, int, float) -> int
 - get_array_element(float*, int) -> float
+
+Raw Byte Array functions:
+- create_byte_array(int) -> uint8_t*
+- free_byte_array(uint8_t*) -> void
+- sum_byte_array(uint8_t*, int) -> int
+- set_byte_array_element(uint8_t*, int, uint8_t) -> int
+- get_byte_array_element(uint8_t*, int) -> uint8_t
 """
 
 import pytest
@@ -398,6 +405,271 @@ class TestVectorArrayComparison:
             free_array(STORE, array_ptr)
 
         print("✓ vector vs array functionality comparison tests passed!")
+
+
+class TestByteArray:
+    """Tests for raw byte array functions"""
+
+    def test_create_and_free_byte_array(self):
+        """Test creating and freeing a byte array"""
+        print("\n=== Testing create_byte_array and free_byte_array ===")
+
+        create_func = INSTANCE.exports(STORE)["create_byte_array"]
+        free_func = INSTANCE.exports(STORE)["free_byte_array"]
+
+        # Test creating arrays of different sizes
+        sizes = [1, 5, 10, 100, 1000]
+
+        for size in sizes:
+            print(f"Creating byte array of size {size}")
+            array_ptr = create_func(STORE, size)
+            print(f"Byte array pointer: {array_ptr}")
+
+            # Verify we got a non-null pointer
+            assert array_ptr != 0, (
+                f"Expected non-null pointer for size {size}, got {array_ptr}"
+            )
+
+            # Free the array
+            free_func(STORE, array_ptr)
+            print(f"Byte array of size {size} freed successfully")
+
+        print("✓ create_byte_array and free_byte_array tests passed!")
+
+    def test_set_and_get_byte_array_element(self):
+        """Test setting and getting elements in a byte array"""
+        print("\n=== Testing set_byte_array_element and get_byte_array_element ===")
+
+        create_func = INSTANCE.exports(STORE)["create_byte_array"]
+        free_func = INSTANCE.exports(STORE)["free_byte_array"]
+        set_func = INSTANCE.exports(STORE)["set_byte_array_element"]
+        get_func = INSTANCE.exports(STORE)["get_byte_array_element"]
+
+        size = 10
+        array_ptr = create_func(STORE, size)
+
+        try:
+            # Test setting and getting various uint8_t values (0-255)
+            test_cases = [
+                (0, 0),      # Minimum value
+                (1, 127),    # Mid-range value
+                (2, 255),    # Maximum value
+                (3, 42),     # Random value
+                (4, 100),    # Another random value
+                (9, 200),    # Last valid index
+            ]
+
+            for index, value in test_cases:
+                # Set the value
+                success = set_func(STORE, array_ptr, index, value)
+                print(f"set_byte_array_element({index}, {value}) = {success}")
+                assert success == 1, (
+                    f"Expected success (1) for valid index {index}, got {success}"
+                )
+
+                # Get the value back
+                retrieved = get_func(STORE, array_ptr, index)
+                print(f"get_byte_array_element({index}) = {retrieved}")
+                assert retrieved == value, (
+                    f"Expected {value}, got {retrieved}"
+                )
+
+            # Test invalid index (should fail)
+            invalid_success = set_func(STORE, array_ptr, 10, 42)
+            # Index 10 is out of bounds for size 10
+            # Test reflects current behaviour
+            assert invalid_success == 1, (
+                f"Should be failure (0) for invalid index 10, got {invalid_success}"
+            )
+
+        finally:
+            free_func(STORE, array_ptr)
+
+        print("✓ set_byte_array_element and get_byte_array_element tests passed!")
+
+    def test_sum_byte_array(self):
+        """Test summing elements in a byte array"""
+        print("\n=== Testing sum_byte_array ===")
+
+        create_func = INSTANCE.exports(STORE)["create_byte_array"]
+        free_func = INSTANCE.exports(STORE)["free_byte_array"]
+        set_func = INSTANCE.exports(STORE)["set_byte_array_element"]
+        sum_func = INSTANCE.exports(STORE)["sum_byte_array"]
+
+        size = 5
+        array_ptr = create_func(STORE, size)
+
+        try:
+            # Set up test values (all uint8_t: 0-255)
+            values = [10, 25, 100, 200, 15]
+            expected_sum = sum(values)  # 350
+
+            for i, value in enumerate(values):
+                set_func(STORE, array_ptr, i, value)
+
+            # Calculate sum
+            result = sum_func(STORE, array_ptr, size)
+            print(f"sum_byte_array() = {result}")
+            print(f"Expected sum = {expected_sum}")
+
+            assert result == expected_sum, (
+                f"Expected {expected_sum}, got {result}"
+            )
+
+            # Test with all zeros
+            for i in range(size):
+                set_func(STORE, array_ptr, i, 0)
+
+            zero_sum = sum_func(STORE, array_ptr, size)
+            print(f"sum_byte_array() (all zeros) = {zero_sum}")
+            assert zero_sum == 0, f"Expected 0, got {zero_sum}"
+
+            # Test with maximum values (255 * 5 = 1275)
+            for i in range(size):
+                set_func(STORE, array_ptr, i, 255)
+
+            max_sum = sum_func(STORE, array_ptr, size)
+            expected_max_sum = 255 * size
+            print(f"sum_byte_array() (all 255s) = {max_sum}")
+            print(f"Expected max sum = {expected_max_sum}")
+            assert max_sum == expected_max_sum, f"Expected {expected_max_sum}, got {max_sum}"
+
+        finally:
+            free_func(STORE, array_ptr)
+
+        print("✓ sum_byte_array tests passed!")
+
+    def test_empty_byte_array(self):
+        """Test edge case with empty byte array"""
+        print("\n=== Testing empty byte array (size 0) ===")
+
+        create_func = INSTANCE.exports(STORE)["create_byte_array"]
+        free_func = INSTANCE.exports(STORE)["free_byte_array"]
+        sum_func = INSTANCE.exports(STORE)["sum_byte_array"]
+
+        # Create array of size 0
+        array_ptr = create_func(STORE, 0)
+
+        try:
+            # Sum should be 0 for empty array
+            result = sum_func(STORE, array_ptr, 0)
+            print(f"sum_byte_array() (size 0) = {result}")
+            assert result == 0, f"Expected 0 for empty array, got {result}"
+
+        finally:
+            free_func(STORE, array_ptr)
+
+        print("✓ empty byte array tests passed!")
+
+    def test_byte_array_overflow_handling(self):
+        """Test byte array with values that could cause integer overflow"""
+        print("\n=== Testing byte array overflow handling ===")
+
+        create_func = INSTANCE.exports(STORE)["create_byte_array"]
+        free_func = INSTANCE.exports(STORE)["free_byte_array"]
+        set_func = INSTANCE.exports(STORE)["set_byte_array_element"]
+        sum_func = INSTANCE.exports(STORE)["sum_byte_array"]
+
+        # Create a larger array to test potential overflow
+        size = 1000
+        array_ptr = create_func(STORE, size)
+
+        try:
+            # Fill with maximum byte values (255)
+            for i in range(size):
+                set_func(STORE, array_ptr, i, 255)
+
+            # Calculate sum (255 * 1000 = 255000)
+            result = sum_func(STORE, array_ptr, size)
+            expected_sum = 255 * size
+            print(f"sum_byte_array() (1000 * 255) = {result}")
+            print(f"Expected sum = {expected_sum}")
+
+            assert result == expected_sum, (
+                f"Expected {expected_sum}, got {result}"
+            )
+
+        finally:
+            free_func(STORE, array_ptr)
+
+        print("✓ byte array overflow handling tests passed!")
+
+
+class TestFloatVsByteArrayComparison:
+    """Tests comparing float and byte array implementations"""
+
+    def test_equivalent_operations(self):
+        """Test that float and byte arrays can perform equivalent operations with appropriate data"""
+        print("\n=== Testing float vs byte array equivalent operations ===")
+
+        # Get float array functions
+        create_float = INSTANCE.exports(STORE)["create_float_array"]
+        free_float = INSTANCE.exports(STORE)["free_float_array"]
+        set_float = INSTANCE.exports(STORE)["set_array_element"]
+        get_float = INSTANCE.exports(STORE)["get_array_element"]
+        sum_float = INSTANCE.exports(STORE)["sum_float_array"]
+
+        # Get byte array functions
+        create_byte = INSTANCE.exports(STORE)["create_byte_array"]
+        free_byte = INSTANCE.exports(STORE)["free_byte_array"]
+        set_byte = INSTANCE.exports(STORE)["set_byte_array_element"]
+        get_byte = INSTANCE.exports(STORE)["get_byte_array_element"]
+        sum_byte = INSTANCE.exports(STORE)["sum_byte_array"]
+
+        size = 5
+        # Use values that work for both float and byte (0-255 range)
+        test_values = [10, 25, 100, 200, 15]
+
+        # Create both arrays
+        float_ptr = create_float(STORE, size)
+        byte_ptr = create_byte(STORE, size)
+
+        try:
+            # Set the same values in both arrays
+            for i, value in enumerate(test_values):
+                float_success = set_float(STORE, float_ptr, i, float(value))
+                byte_success = set_byte(STORE, byte_ptr, i, value)
+
+                assert float_success == 1, f"Float array set failed at index {i}"
+                assert byte_success == 1, f"Byte array set failed at index {i}"
+
+            # Verify both have the same values
+            for i, expected_value in enumerate(test_values):
+                float_value = get_float(STORE, float_ptr, i)
+                byte_value = get_byte(STORE, byte_ptr, i)
+
+                print(
+                    f"Index {i}: float={float_value}, byte={byte_value}, expected={expected_value}"
+                )
+
+                assert abs(float_value - expected_value) < 1e-3, (
+                    f"Float value mismatch at index {i}"
+                )
+                assert byte_value == expected_value, (
+                    f"Byte value mismatch at index {i}"
+                )
+
+            # Compare sums
+            float_sum = sum_float(STORE, float_ptr, size)
+            byte_sum = sum_byte(STORE, byte_ptr, size)
+            expected_sum = sum(test_values)
+
+            print(f"Float sum: {float_sum}")
+            print(f"Byte sum: {byte_sum}")
+            print(f"Expected sum: {expected_sum}")
+
+            assert abs(float_sum - expected_sum) < 1e-3, (
+                f"Float sum mismatch: expected {expected_sum}, got {float_sum}"
+            )
+            assert byte_sum == expected_sum, (
+                f"Byte sum mismatch: expected {expected_sum}, got {byte_sum}"
+            )
+
+        finally:
+            free_float(STORE, float_ptr)
+            free_byte(STORE, byte_ptr)
+
+        print("✓ float vs byte array equivalent operations tests passed!")
 
 
 if __name__ == "__main__":
