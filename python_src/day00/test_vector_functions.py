@@ -33,15 +33,15 @@ class TestFloatVector:
         """Test creating and freeing a float vector"""
         print("\n=== Testing create_float_vector and free_float_vector ===")
 
-        create_func = INSTANCE.exports(STORE)["create_float_vector"]  # type: ignore
-        free_func = INSTANCE.exports(STORE)["free_float_vector"]  # type: ignore
+        create_func = INSTANCE.exports(STORE)["create_float_vector"]
+        free_func = INSTANCE.exports(STORE)["free_float_vector"]
 
         # Test creating vectors of different sizes
         sizes = [1, 5, 10, 100, 1000]
 
         for size in sizes:
             print(f"Creating vector of size {size}")
-            vector_ptr = create_func(STORE, size)  # type: ignore
+            vector_ptr = create_func(STORE, size)
             print(f"Vector pointer: {vector_ptr}")
 
             # Verify we got a non-null pointer
@@ -50,7 +50,7 @@ class TestFloatVector:
             )
 
             # Free the vector
-            free_func(STORE, vector_ptr)  # type: ignore
+            free_func(STORE, vector_ptr)
             print(f"Vector of size {size} freed successfully")
 
         print("✓ create_float_vector and free_float_vector tests passed!")
@@ -59,13 +59,13 @@ class TestFloatVector:
         """Test setting and getting elements in a float vector"""
         print("\n=== Testing set_vector_element and get_vector_element ===")
 
-        create_func = INSTANCE.exports(STORE)["create_float_vector"]  # type: ignore
-        free_func = INSTANCE.exports(STORE)["free_float_vector"]  # type: ignore
-        set_func = INSTANCE.exports(STORE)["set_vector_element"]  # type: ignore
-        get_func = INSTANCE.exports(STORE)["get_vector_element"]  # type: ignore
+        create_func = INSTANCE.exports(STORE)["create_float_vector"]
+        free_func = INSTANCE.exports(STORE)["free_float_vector"]
+        set_func = INSTANCE.exports(STORE)["set_vector_element"]
+        get_func = INSTANCE.exports(STORE)["get_vector_element"]
 
         size = 10
-        vector_ptr = create_func(STORE, size)  # type: ignore
+        vector_ptr = create_func(STORE, size)
 
         try:
             # Test setting and getting various values
@@ -80,21 +80,21 @@ class TestFloatVector:
 
             for index, value in test_cases:
                 # Set the value
-                success = set_func(STORE, vector_ptr, index, value)  # type: ignore
+                success = set_func(STORE, vector_ptr, index, value)
                 print(f"set_vector_element({index}, {value}) = {success}")
                 assert success == 1, (
                     f"Expected success (1) for valid index {index}, got {success}"
                 )
 
                 # Get the value back
-                retrieved = get_func(STORE, vector_ptr, index)  # type: ignore
+                retrieved = get_func(STORE, vector_ptr, index)
                 print(f"get_vector_element({index}) = {retrieved}")
                 assert abs(retrieved - value) < 1e-3, (
                     f"Expected {value}, got {retrieved}"
                 )
 
             # Test invalid index (should fail)
-            invalid_success = set_func(STORE, vector_ptr, 10, 42.0)  # type: ignore  # Index 10 is out of bounds for size 10
+            invalid_success = set_func(STORE, vector_ptr, 10, 42.0)  # Index 10 is out of bounds for size 10
             print(
                 f"set_vector_element(10, 42.0) = {invalid_success} (should be 0 for out of bounds)"
             )
@@ -103,7 +103,7 @@ class TestFloatVector:
             )
 
         finally:
-            free_func(STORE, vector_ptr)  # type: ignore
+            free_func(STORE, vector_ptr)
 
         print("✓ set_vector_element and get_vector_element tests passed!")
 
@@ -111,13 +111,13 @@ class TestFloatVector:
         """Test summing elements in a float vector"""
         print("\n=== Testing sum_float_vector ===")
 
-        create_func = INSTANCE.exports(STORE)["create_float_vector"]  # type: ignore
-        free_func = INSTANCE.exports(STORE)["free_float_vector"]  # type: ignore
-        set_func = INSTANCE.exports(STORE)["set_vector_element"]  # type: ignore
-        sum_func = INSTANCE.exports(STORE)["sum_float_vector"]  # type: ignore
+        create_func = INSTANCE.exports(STORE)["create_float_vector"]
+        free_func = INSTANCE.exports(STORE)["free_float_vector"]
+        set_func = INSTANCE.exports(STORE)["set_vector_element"]
+        sum_func = INSTANCE.exports(STORE)["sum_float_vector"]
 
         size = 5
-        vector_ptr = create_func(STORE, size)  # type: ignore
+        vector_ptr = create_func(STORE, size)
 
         try:
             # Set up test values
@@ -125,10 +125,10 @@ class TestFloatVector:
             expected_sum = sum(values)
 
             for i, value in enumerate(values):
-                set_func(STORE, vector_ptr, i, value)  # type: ignore
+                set_func(STORE, vector_ptr, i, value)
 
             # Calculate sum
-            result = sum_func(STORE, vector_ptr)  # type: ignore
+            result = sum_func(STORE, vector_ptr)
             print(f"sum_float_vector() = {result}")
             print(f"Expected sum = {expected_sum}")
 
@@ -138,14 +138,14 @@ class TestFloatVector:
 
             # Test with all zeros
             for i in range(size):
-                set_func(STORE, vector_ptr, i, 0.0)  # type: ignore
+                set_func(STORE, vector_ptr, i, 0.0)
 
-            zero_sum = sum_func(STORE, vector_ptr)  # type: ignore
+            zero_sum = sum_func(STORE, vector_ptr)
             print(f"sum_float_vector() (all zeros) = {zero_sum}")
             assert abs(zero_sum) < 1e-6, f"Expected 0.0, got {zero_sum}"
 
         finally:
-            free_func(STORE, vector_ptr)  # type: ignore
+            free_func(STORE, vector_ptr)
 
         print("✓ sum_float_vector tests passed!")
 
@@ -153,21 +153,21 @@ class TestFloatVector:
         """Test edge case with empty vector"""
         print("\n=== Testing empty vector (size 0) ===")
 
-        create_func = INSTANCE.exports(STORE)["create_float_vector"]  # type: ignore
-        free_func = INSTANCE.exports(STORE)["free_float_vector"]  # type: ignore
-        sum_func = INSTANCE.exports(STORE)["sum_float_vector"]  # type: ignore
+        create_func = INSTANCE.exports(STORE)["create_float_vector"]
+        free_func = INSTANCE.exports(STORE)["free_float_vector"]
+        sum_func = INSTANCE.exports(STORE)["sum_float_vector"]
 
         # Create vector of size 0
-        vector_ptr = create_func(STORE, 0)  # type: ignore
+        vector_ptr = create_func(STORE, 0)
 
         try:
             # Sum should be 0 for empty vector
-            result = sum_func(STORE, vector_ptr)  # type: ignore
+            result = sum_func(STORE, vector_ptr)
             print(f"sum_float_vector() (size 0) = {result}")
             assert abs(result) < 1e-6, f"Expected 0.0 for empty vector, got {result}"
 
         finally:
-            free_func(STORE, vector_ptr)  # type: ignore
+            free_func(STORE, vector_ptr)
 
         print("✓ empty vector tests passed!")
 
@@ -179,15 +179,15 @@ class TestFloatArray:
         """Test creating and freeing a float array"""
         print("\n=== Testing create_float_array and free_float_array ===")
 
-        create_func = INSTANCE.exports(STORE)["create_float_array"]  # type: ignore
-        free_func = INSTANCE.exports(STORE)["free_float_array"]  # type: ignore
+        create_func = INSTANCE.exports(STORE)["create_float_array"]
+        free_func = INSTANCE.exports(STORE)["free_float_array"]
 
         # Test creating arrays of different sizes
         sizes = [1, 5, 10, 100, 1000]
 
         for size in sizes:
             print(f"Creating array of size {size}")
-            array_ptr = create_func(STORE, size)  # type: ignore
+            array_ptr = create_func(STORE, size)
             print(f"Array pointer: {array_ptr}")
 
             # Verify we got a non-null pointer
@@ -196,7 +196,7 @@ class TestFloatArray:
             )
 
             # Free the array
-            free_func(STORE, array_ptr)  # type: ignore
+            free_func(STORE, array_ptr)
             print(f"Array of size {size} freed successfully")
 
         print("✓ create_float_array and free_float_array tests passed!")
@@ -205,13 +205,13 @@ class TestFloatArray:
         """Test setting and getting elements in a float array"""
         print("\n=== Testing set_array_element and get_array_element ===")
 
-        create_func = INSTANCE.exports(STORE)["create_float_array"]  # type: ignore
-        free_func = INSTANCE.exports(STORE)["free_float_array"]  # type: ignore
-        set_func = INSTANCE.exports(STORE)["set_array_element"]  # type: ignore
-        get_func = INSTANCE.exports(STORE)["get_array_element"]  # type: ignore
+        create_func = INSTANCE.exports(STORE)["create_float_array"]
+        free_func = INSTANCE.exports(STORE)["free_float_array"]
+        set_func = INSTANCE.exports(STORE)["set_array_element"]
+        get_func = INSTANCE.exports(STORE)["get_array_element"]
 
         size = 10
-        array_ptr = create_func(STORE, size)  # type: ignore
+        array_ptr = create_func(STORE, size)
 
         try:
             # Test setting and getting various values
@@ -226,21 +226,21 @@ class TestFloatArray:
 
             for index, value in test_cases:
                 # Set the value
-                success = set_func(STORE, array_ptr, index, value)  # type: ignore
+                success = set_func(STORE, array_ptr, index, value)
                 print(f"set_array_element({index}, {value}) = {success}")
                 assert success == 1, (
                     f"Expected success (1) for valid index {index}, got {success}"
                 )
 
                 # Get the value back
-                retrieved = get_func(STORE, array_ptr, index)  # type: ignore
+                retrieved = get_func(STORE, array_ptr, index)
                 print(f"get_array_element({index}) = {retrieved}")
                 assert abs(retrieved - value) < 1e-3, (
                     f"Expected {value}, got {retrieved}"
                 )
 
             # Test invalid index (should fail)
-            invalid_success = set_func(STORE, array_ptr, 10, 42.0)  # type: ignore
+            invalid_success = set_func(STORE, array_ptr, 10, 42.0)
             # Index 10 is out of bounds for size 10
             # Test reflects current behaviour
             assert invalid_success == 1, (
@@ -248,7 +248,7 @@ class TestFloatArray:
             )
 
         finally:
-            free_func(STORE, array_ptr)  # type: ignore
+            free_func(STORE, array_ptr)
 
         print("✓ set_array_element and get_array_element tests passed!")
 
@@ -256,13 +256,13 @@ class TestFloatArray:
         """Test summing elements in a float array"""
         print("\n=== Testing sum_float_array ===")
 
-        create_func = INSTANCE.exports(STORE)["create_float_array"]  # type: ignore
-        free_func = INSTANCE.exports(STORE)["free_float_array"]  # type: ignore
-        set_func = INSTANCE.exports(STORE)["set_array_element"]  # type: ignore
-        sum_func = INSTANCE.exports(STORE)["sum_float_array"]  # type: ignore
+        create_func = INSTANCE.exports(STORE)["create_float_array"]
+        free_func = INSTANCE.exports(STORE)["free_float_array"]
+        set_func = INSTANCE.exports(STORE)["set_array_element"]
+        sum_func = INSTANCE.exports(STORE)["sum_float_array"]
 
         size = 5
-        array_ptr = create_func(STORE, size)  # type: ignore
+        array_ptr = create_func(STORE, size)
 
         try:
             # Set up test values
@@ -270,10 +270,10 @@ class TestFloatArray:
             expected_sum = sum(values)
 
             for i, value in enumerate(values):
-                set_func(STORE, array_ptr, i, value)  # type: ignore
+                set_func(STORE, array_ptr, i, value)
 
             # Calculate sum
-            result = sum_func(STORE, array_ptr, size)  # type: ignore
+            result = sum_func(STORE, array_ptr, size)
             print(f"sum_float_array() = {result}")
             print(f"Expected sum = {expected_sum}")
 
@@ -283,14 +283,14 @@ class TestFloatArray:
 
             # Test with all zeros
             for i in range(size):
-                set_func(STORE, array_ptr, i, 0.0)  # type: ignore
+                set_func(STORE, array_ptr, i, 0.0)
 
-            zero_sum = sum_func(STORE, array_ptr, size)  # type: ignore
+            zero_sum = sum_func(STORE, array_ptr, size)
             print(f"sum_float_array() (all zeros) = {zero_sum}")
             assert abs(zero_sum) < 1e-6, f"Expected 0.0, got {zero_sum}"
 
         finally:
-            free_func(STORE, array_ptr)  # type: ignore
+            free_func(STORE, array_ptr)
 
         print("✓ sum_float_array tests passed!")
 
@@ -298,21 +298,21 @@ class TestFloatArray:
         """Test edge case with empty array"""
         print("\n=== Testing empty array (size 0) ===")
 
-        create_func = INSTANCE.exports(STORE)["create_float_array"]  # type: ignore
-        free_func = INSTANCE.exports(STORE)["free_float_array"]  # type: ignore
-        sum_func = INSTANCE.exports(STORE)["sum_float_array"]  # type: ignore
+        create_func = INSTANCE.exports(STORE)["create_float_array"]
+        free_func = INSTANCE.exports(STORE)["free_float_array"]
+        sum_func = INSTANCE.exports(STORE)["sum_float_array"]
 
         # Create array of size 0
-        array_ptr = create_func(STORE, 0)  # type: ignore
+        array_ptr = create_func(STORE, 0)
 
         try:
             # Sum should be 0 for empty array
-            result = sum_func(STORE, array_ptr, 0)  # type: ignore
+            result = sum_func(STORE, array_ptr, 0)
             print(f"sum_float_array() (size 0) = {result}")
             assert abs(result) < 1e-6, f"Expected 0.0 for empty array, got {result}"
 
         finally:
-            free_func(STORE, array_ptr)  # type: ignore
+            free_func(STORE, array_ptr)
 
         print("✓ empty array tests passed!")
 
@@ -325,38 +325,38 @@ class TestVectorArrayComparison:
         print("\n=== Testing vector vs array functionality comparison ===")
 
         # Get all the functions
-        create_vector = INSTANCE.exports(STORE)["create_float_vector"]  # type: ignore
-        free_vector = INSTANCE.exports(STORE)["free_float_vector"]  # type: ignore
-        set_vector = INSTANCE.exports(STORE)["set_vector_element"]  # type: ignore
-        get_vector = INSTANCE.exports(STORE)["get_vector_element"]  # type: ignore
-        sum_vector = INSTANCE.exports(STORE)["sum_float_vector"]  # type: ignore
+        create_vector = INSTANCE.exports(STORE)["create_float_vector"]
+        free_vector = INSTANCE.exports(STORE)["free_float_vector"]
+        set_vector = INSTANCE.exports(STORE)["set_vector_element"]
+        get_vector = INSTANCE.exports(STORE)["get_vector_element"]
+        sum_vector = INSTANCE.exports(STORE)["sum_float_vector"]
 
-        create_array = INSTANCE.exports(STORE)["create_float_array"]  # type: ignore
-        free_array = INSTANCE.exports(STORE)["free_float_array"]  # type: ignore
-        set_array = INSTANCE.exports(STORE)["set_array_element"]  # type: ignore
-        get_array = INSTANCE.exports(STORE)["get_array_element"]  # type: ignore
-        sum_array = INSTANCE.exports(STORE)["sum_float_array"]  # type: ignore
+        create_array = INSTANCE.exports(STORE)["create_float_array"]
+        free_array = INSTANCE.exports(STORE)["free_float_array"]
+        set_array = INSTANCE.exports(STORE)["set_array_element"]
+        get_array = INSTANCE.exports(STORE)["get_array_element"]
+        sum_array = INSTANCE.exports(STORE)["sum_float_array"]
 
         size = 6
         test_values = [1.0, -2.5, 3.14, 0.0, -100.75, 42.42]
 
         # Create both vector and array
-        vector_ptr = create_vector(STORE, size)  # type: ignore
-        array_ptr = create_array(STORE, size)  # type: ignore
+        vector_ptr = create_vector(STORE, size)
+        array_ptr = create_array(STORE, size)
 
         try:
             # Set the same values in both
             for i, value in enumerate(test_values):
-                vec_success = set_vector(STORE, vector_ptr, i, value)  # type: ignore
-                arr_success = set_array(STORE, array_ptr, i, value)  # type: ignore
+                vec_success = set_vector(STORE, vector_ptr, i, value)
+                arr_success = set_array(STORE, array_ptr, i, value)
 
                 assert vec_success == 1, f"Vector set failed at index {i}"
                 assert arr_success == 1, f"Array set failed at index {i}"
 
             # Verify both have the same values
             for i, expected_value in enumerate(test_values):
-                vec_value = get_vector(STORE, vector_ptr, i)  # type: ignore
-                arr_value = get_array(STORE, array_ptr, i)  # type: ignore
+                vec_value = get_vector(STORE, vector_ptr, i)
+                arr_value = get_array(STORE, array_ptr, i)
 
                 print(
                     f"Index {i}: vector={vec_value}, array={arr_value}, expected={expected_value}"
@@ -373,8 +373,8 @@ class TestVectorArrayComparison:
                 )
 
             # Compare sums
-            vec_sum = sum_vector(STORE, vector_ptr)  # type: ignore
-            arr_sum = sum_array(STORE, array_ptr, size)  # type: ignore
+            vec_sum = sum_vector(STORE, vector_ptr)
+            arr_sum = sum_array(STORE, array_ptr, size)
             expected_sum = sum(test_values)
 
             print(f"Vector sum: {vec_sum}")
@@ -392,8 +392,8 @@ class TestVectorArrayComparison:
             )
 
         finally:
-            free_vector(STORE, vector_ptr)  # type: ignore
-            free_array(STORE, array_ptr)  # type: ignore
+            free_vector(STORE, vector_ptr)
+            free_array(STORE, array_ptr)
 
         print("✓ vector vs array functionality comparison tests passed!")
 

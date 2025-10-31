@@ -24,7 +24,7 @@ def test_add_function():
     test_cases = [(5, 3), (10, -2), (0, 0), (-5, -10), (100, 200)]
 
     for a, b in test_cases:
-        result = add_func(STORE, a, b)  # type: ignore
+        result = add_func(STORE, a, b)
         print(f"add({a}, {b}) = {result}")
         assert result == a + b, f"Expected {a + b}, got {result}"
 
@@ -39,7 +39,7 @@ def test_multiply_function():
     test_cases = [(5, 3), (10, -2), (0, 5), (-5, -10), (7, 8)]
 
     for a, b in test_cases:
-        result = multiply_func(STORE, a, b)  # type: ignore
+        result = multiply_func(STORE, a, b)
         print(f"multiply({a}, {b}) = {result}")
         assert result == a * b, f"Expected {a * b}, got {result}"
 
@@ -63,7 +63,7 @@ def test_factorial_function():
     test_cases = [0, 1, 2, 3, 4, 5, 6, 7, 8, 10]
 
     for n in test_cases:
-        result = factorial_func(STORE, n)  # type: ignore
+        result = factorial_func(STORE, n)
         expected = python_factorial(n)
         print(f"factorial({n}) = {result}")
         assert result == expected, f"Expected {expected}, got {result}"
@@ -74,7 +74,7 @@ def test_factorial_function():
 def test_power_function():
     """Test the power function: power(double, int) -> double"""
     print("\n=== Testing power function ===")
-    power_func = INSTANCE.exports(STORE)["power"]  # type: ignore
+    power_func = INSTANCE.exports(STORE)["power"]
 
     test_cases = [
         (2.0, 3),
@@ -87,7 +87,7 @@ def test_power_function():
     ]
 
     for base, exponent in test_cases:
-        result = power_func(STORE, base, exponent)  # type: ignore
+        result = power_func(STORE, base, exponent)
         expected = base**exponent
         print(f"power({base}, {exponent}) = {result}")
         # Use approximate comparison for floating point
