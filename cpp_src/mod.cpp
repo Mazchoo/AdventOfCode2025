@@ -124,6 +124,12 @@ extern "C" {
     int sum_byte_array(uint8_t* ptr, int size) {
         return day00::sum_byte_array(ptr, size);
     }
+
+    // SIMD-optimized version of sum_byte_array (WASM only)
+    EXPORT_FUNC
+    int sum_byte_array_simd(uint8_t* ptr, int size) {
+        return day00::sum_byte_array_simd(ptr, size);
+    }
     
     // Sets a value at specified index in byte array
     // Returns 1 for success, 0 for failure

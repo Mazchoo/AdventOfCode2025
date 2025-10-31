@@ -55,6 +55,7 @@ print(f"Numpy byte measurement {(end - start):.3}")
 create_func = INSTANCE.exports(STORE)["create_byte_array"]
 free_func = INSTANCE.exports(STORE)["free_byte_array"]
 sum_func = INSTANCE.exports(STORE)["sum_byte_array"]
+sum_func_simd = INSTANCE.exports(STORE)["sum_byte_array_simd"]
 
 byte_array = create_func(STORE, ARRAY_SIZE)
 
@@ -62,5 +63,10 @@ start = perf_counter()
 sum_func(STORE, byte_array, ARRAY_SIZE)
 end = perf_counter()
 print(f"C style byte wasm measurement {(end - start):.3}")
+
+start = perf_counter()
+sum_func_simd(STORE, byte_array, ARRAY_SIZE)
+end = perf_counter()
+print(f"C style byte wasm simd measurement {(end - start):.3}")
 
 free_func(STORE, byte_array)

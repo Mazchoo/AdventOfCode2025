@@ -451,12 +451,12 @@ class TestByteArray:
         try:
             # Test setting and getting various uint8_t values (0-255)
             test_cases = [
-                (0, 0),      # Minimum value
-                (1, 127),    # Mid-range value
-                (2, 255),    # Maximum value
-                (3, 42),     # Random value
-                (4, 100),    # Another random value
-                (9, 200),    # Last valid index
+                (0, 0),  # Minimum value
+                (1, 127),  # Mid-range value
+                (2, 255),  # Maximum value
+                (3, 42),  # Random value
+                (4, 100),  # Another random value
+                (9, 200),  # Last valid index
             ]
 
             for index, value in test_cases:
@@ -470,9 +470,7 @@ class TestByteArray:
                 # Get the value back
                 retrieved = get_func(STORE, array_ptr, index)
                 print(f"get_byte_array_element({index}) = {retrieved}")
-                assert retrieved == value, (
-                    f"Expected {value}, got {retrieved}"
-                )
+                assert retrieved == value, f"Expected {value}, got {retrieved}"
 
             # Test invalid index (should fail)
             invalid_success = set_func(STORE, array_ptr, 10, 42)
@@ -512,9 +510,7 @@ class TestByteArray:
             print(f"sum_byte_array() = {result}")
             print(f"Expected sum = {expected_sum}")
 
-            assert result == expected_sum, (
-                f"Expected {expected_sum}, got {result}"
-            )
+            assert result == expected_sum, f"Expected {expected_sum}, got {result}"
 
             # Test with all zeros
             for i in range(size):
@@ -532,12 +528,120 @@ class TestByteArray:
             expected_max_sum = 255 * size
             print(f"sum_byte_array() (all 255s) = {max_sum}")
             print(f"Expected max sum = {expected_max_sum}")
-            assert max_sum == expected_max_sum, f"Expected {expected_max_sum}, got {max_sum}"
+            assert max_sum == expected_max_sum, (
+                f"Expected {expected_max_sum}, got {max_sum}"
+            )
 
         finally:
             free_func(STORE, array_ptr)
 
         print("✓ sum_byte_array tests passed!")
+
+    def test_sum_byte_array_simd(self):
+        """Test summing elements in a byte array using SIMD optimization"""
+        print("\n=== Testing sum_byte_array_simd ===")
+
+        create_func = INSTANCE.exports(STORE)["create_byte_array"]
+        free_func = INSTANCE.exports(STORE)["free_byte_array"]
+        set_func = INSTANCE.exports(STORE)["set_byte_array_element"]
+        sum_func = INSTANCE.exports(STORE)["sum_byte_array"]
+
+        # Try to get the SIMD function - it may not exist in non-WASM builds
+        try:
+            sum_simd_func = INSTANCE.exports(STORE)["sum_byte_array_simd"]
+        except KeyError:
+            print(
+                "sum_byte_array_simd not available - skipping SIMD tests (likely non-WASM build)"
+            )
+            return
+
+        # Test various array sizes to verify SIMD implementation
+        test_cases = [
+            (5, [10, 25, 100, 200, 15]),  # Small array
+            (16, list(range(1, 17))),  # Exactly one SIMD block (16 bytes)
+            (17, list(range(1, 18))),  # One SIMD block + 1 remainder
+            (32, list(range(1, 33))),  # Two SIMD blocks
+            (35, list(range(1, 36))),  # Two SIMD blocks + 3 remainder
+            (50, [255] * 50),  # Larger array with max values
+        ]
+
+        for size, values in test_cases:
+            print(f"Testing SIMD with array size {size}")
+            array_ptr = create_func(STORE, size)
+
+            try:
+                # Set up test values
+                for i, value in enumerate(values):
+                    set_func(
+                        STORE, array_ptr, i, value % 256
+                    )  # Ensure valid uint8_t range
+
+                # Calculate sum using both regular and SIMD functions
+                regular_result = sum_func(STORE, array_ptr, size)
+                simd_result = sum_simd_func(STORE, array_ptr, size)
+                expected_sum = sum(v % 256 for v in values)
+
+                print(f"  Regular sum: {regular_result}")
+                print(f"  SIMD sum: {simd_result}")
+                print(f"  Expected sum: {expected_sum}")
+
+                # Verify both methods produce the same result
+                assert regular_result == expected_sum, (
+                    f"Regular sum mismatch: expected {expected_sum}, got {regular_result}"
+                )
+                assert simd_result == expected_sum, (
+                    f"SIMD sum mismatch: expected {expected_sum}, got {simd_result}"
+                )
+                assert regular_result == simd_result, (
+                    f"SIMD and regular results differ: regular={regular_result}, simd={simd_result}"
+                )
+
+            finally:
+                free_func(STORE, array_ptr)
+
+        # Test edge cases
+        print("Testing SIMD edge cases...")
+
+        # Empty array
+        array_ptr = create_func(STORE, 0)
+        try:
+            regular_result = sum_func(STORE, array_ptr, 0)
+            simd_result = sum_simd_func(STORE, array_ptr, 0)
+            assert regular_result == 0, (
+                f"Expected 0 for empty array, got {regular_result}"
+            )
+            assert simd_result == 0, (
+                f"Expected 0 for empty SIMD array, got {simd_result}"
+            )
+            assert regular_result == simd_result, "Empty array results should match"
+        finally:
+            free_func(STORE, array_ptr)
+
+        # Large array with maximum values to test overflow handling
+        size = 1000
+        array_ptr = create_func(STORE, size)
+        try:
+            for i in range(size):
+                set_func(STORE, array_ptr, i, 255)
+
+            regular_result = sum_func(STORE, array_ptr, size)
+            simd_result = sum_simd_func(STORE, array_ptr, size)
+            expected_sum = 255 * size
+
+            print(
+                f"Large array test: regular={regular_result}, simd={simd_result}, expected={expected_sum}"
+            )
+            assert regular_result == expected_sum, (
+                f"Large array regular sum mismatch: expected {expected_sum}, got {regular_result}"
+            )
+            assert simd_result == expected_sum, (
+                f"Large array SIMD sum mismatch: expected {expected_sum}, got {simd_result}"
+            )
+            assert regular_result == simd_result, "Large array results should match"
+        finally:
+            free_func(STORE, array_ptr)
+
+        print("✓ sum_byte_array_simd tests passed!")
 
     def test_empty_byte_array(self):
         """Test edge case with empty byte array"""
@@ -585,9 +689,7 @@ class TestByteArray:
             print(f"sum_byte_array() (1000 * 255) = {result}")
             print(f"Expected sum = {expected_sum}")
 
-            assert result == expected_sum, (
-                f"Expected {expected_sum}, got {result}"
-            )
+            assert result == expected_sum, f"Expected {expected_sum}, got {result}"
 
         finally:
             free_func(STORE, array_ptr)
@@ -645,9 +747,7 @@ class TestFloatVsByteArrayComparison:
                 assert abs(float_value - expected_value) < 1e-3, (
                     f"Float value mismatch at index {i}"
                 )
-                assert byte_value == expected_value, (
-                    f"Byte value mismatch at index {i}"
-                )
+                assert byte_value == expected_value, f"Byte value mismatch at index {i}"
 
             # Compare sums
             float_sum = sum_float(STORE, float_ptr, size)
