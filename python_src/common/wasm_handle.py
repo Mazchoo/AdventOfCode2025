@@ -19,6 +19,11 @@ def load_wasm_module(wasm_path: str) -> Tuple[Store, Instance]:
         module_bytes = f.read()
 
     module = Module(store.engine, module_bytes)
+
+    # Check what imports the module expects
+    imports = module.imports
+    print(f"Module imports: {[(imp.module, imp.name, imp.type) for imp in imports]}")
+
     instance = Instance(store, module, [])
 
     print(

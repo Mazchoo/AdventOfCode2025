@@ -10,7 +10,7 @@ This script loads the mod.wasm binary and tests the exported functions:
 
 import pytest
 
-from src.common.wasm_handle import load_wasm_module
+from python_src.common.wasm_handle import load_wasm_module
 
 
 STORE, INSTANCE = load_wasm_module("./emcc_wasm/build/mod.wasm")
