@@ -21,6 +21,7 @@ create_func = INSTANCE.exports(STORE)["create_float_vector"]
 free_func = INSTANCE.exports(STORE)["free_float_vector"]
 sum_func = INSTANCE.exports(STORE)["sum_float_vector"]
 
+# Default argments, about 4x slower
 vector = create_func(STORE, ARRAY_SIZE)
 
 start = perf_counter()

@@ -94,7 +94,9 @@ class TestFloatVector:
                 )
 
             # Test invalid index (should fail)
-            invalid_success = set_func(STORE, vector_ptr, 10, 42.0)  # Index 10 is out of bounds for size 10
+            invalid_success = set_func(
+                STORE, vector_ptr, 10, 42.0
+            )  # Index 10 is out of bounds for size 10
             print(
                 f"set_vector_element(10, 42.0) = {invalid_success} (should be 0 for out of bounds)"
             )

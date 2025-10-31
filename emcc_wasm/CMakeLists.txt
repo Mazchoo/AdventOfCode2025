@@ -20,7 +20,16 @@ target_include_directories(mod PRIVATE ../cpp_src)
 # Set emscripten-specific flags for WASM
 set_target_properties(mod PROPERTIES
     SUFFIX ".wasm"
-    LINK_FLAGS "-s WASM=1 -s STANDALONE_WASM=1 -s EXPORT_ALL=1 --no-entry -O3"
+    LINK_FLAGS "-s WASM=1 -s STANDALONE_WASM=1 -s EXPORT_ALL=1 --no-entry -O3 -ffast-math -funroll-loops -s ALLOW_MEMORY_GROWTH=1"
+)
+
+# Add compile flags for float optimization
+target_compile_options(mod PRIVATE
+    -O3
+    -ffast-math
+    -funroll-loops
+    -fno-math-errno
+    -ffinite-math-only
 )
 
 # Output file will be mod.wasm

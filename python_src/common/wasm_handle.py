@@ -3,7 +3,7 @@
 import os
 from typing import Tuple
 
-from wasmtime import Store, Module, Instance
+from wasmtime import Store, Module, Instance, Func, FuncType, ValType
 
 
 def load_wasm_module(wasm_path: str) -> Tuple[Store, Instance]:
@@ -24,7 +24,13 @@ def load_wasm_module(wasm_path: str) -> Tuple[Store, Instance]:
     imports = module.imports
     print(f"Module imports: {[(imp.module, imp.name, imp.type) for imp in imports]}")
 
-    instance = Instance(store, module, [])
+    def notify_memory_growth(memory_index: int):
+        # Emscripten usually just updates JS-side views; no-op in Wasmtime
+        pass
+
+    notify_func = Func(store, FuncType([ValType.i32()], []), notify_memory_growth)
+
+    instance = Instance(store, module, [notify_func])
 
     print(
         f"Module loaded successfully. Exports: {list(instance.exports(store).keys())}"
