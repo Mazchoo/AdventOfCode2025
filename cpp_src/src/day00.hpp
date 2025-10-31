@@ -1,6 +1,10 @@
 #include <cstddef>
 #include <cstdint>
 
+#ifdef __EMSCRIPTEN__
+#include <wasm_simd128.h>
+#endif
+
 namespace day00
 {
     int add(int a, int b) {
@@ -174,12 +178,71 @@ namespace day00
         }
     }
     
+#ifdef __EMSCRIPTEN__
+    // SIMD-optimized version for WASM: Process 16 bytes at a time using 128-bit SIMD
+    int sum_byte_array_simd(uint8_t* ptr, int size) {
+        if (ptr == nullptr || size <= 0) {
+            return 0;
+        }
+        
+        int sum = 0;
+        int i = 0;
+        
+        // Process 16 bytes at a time using SIMD
+        const int simd_block_size = 16;
+        const int simd_blocks = size / simd_block_size;
+        
+        if (simd_blocks > 0) {
+            // Initialize accumulator vector to zero
+            v128_t sum_vec = wasm_i32x4_splat(0);
+            
+            for (int block = 0; block < simd_blocks; block++) {
+                // Load 16 bytes into SIMD register
+                v128_t bytes_vec = wasm_v128_load(&ptr[i]);
+                
+                // Process bytes in groups of 4 to fit in 32-bit lanes
+                // Use pointer arithmetic to access individual bytes
+                const uint8_t* byte_ptr = &ptr[i];
+                
+                // Sum groups of 4 bytes each
+                uint32_t sum0 = byte_ptr[0] + byte_ptr[1] + byte_ptr[2] + byte_ptr[3];
+                uint32_t sum1 = byte_ptr[4] + byte_ptr[5] + byte_ptr[6] + byte_ptr[7];
+                uint32_t sum2 = byte_ptr[8] + byte_ptr[9] + byte_ptr[10] + byte_ptr[11];
+                uint32_t sum3 = byte_ptr[12] + byte_ptr[13] + byte_ptr[14] + byte_ptr[15];
+                
+                // Create vector with the 4 sums and add to accumulator
+                v128_t partial_sums = wasm_i32x4_make(sum0, sum1, sum2, sum3);
+                sum_vec = wasm_i32x4_add(sum_vec, partial_sums);
+                
+                i += simd_block_size;
+            }
+            
+            // Extract the 4 lanes using array access instead of extract_lane
+            int32_t result[4];
+            wasm_v128_store(result, sum_vec);
+            sum += result[0] + result[1] + result[2] + result[3];
+        }
+        
+        // Handle remaining bytes (if any)
+        for (; i < size; i++) {
+            sum += ptr[i];
+        }
+        
+        return sum;
+    }
+#else
+    // Default to regular implementation for C++ build
+    int sum_byte_array_simd(uint8_t* ptr, int size) {
+        return sum_byte_array(ptr, size);
+    }
+#endif
+
     // Sums all elements in a raw uint8_t array (returns int to avoid overflow)
     int sum_byte_array(uint8_t* ptr, int size) {
         if (ptr == nullptr || size <= 0) {
             return 0;
         }
-        
+
         int sum = 0;
         for (int i = 0; i < size; i++) {
             sum += ptr[i];
