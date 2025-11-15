@@ -5,6 +5,8 @@ from time import perf_counter
 import numpy as np
 
 from python_src.common.wasm_handle import load_wasm_module
+from python_src.common.vector32 import VectorF32
+
 
 STORE, INSTANCE = load_wasm_module("./emcc_wasm/build/mod.wasm")
 
@@ -17,19 +19,12 @@ input_float_array.sum()
 end = perf_counter()
 print(f"Numpy base measurement {(end - start):.3}")
 
-create_func = INSTANCE.exports(STORE)["create_float_vector"]
-free_func = INSTANCE.exports(STORE)["free_float_vector"]
-sum_func = INSTANCE.exports(STORE)["sum_float_vector"]
-
-# Default argments, about 4x slower
-vector = create_func(STORE, ARRAY_SIZE)
+vector = VectorF32(STORE, INSTANCE, ARRAY_SIZE)
 
 start = perf_counter()
-sum_func(STORE, vector)
+vector.sum()
 end = perf_counter()
 print(f"Vector wasm measurement {(end - start):.3}")
-
-free_func(STORE, vector)
 
 
 create_func = INSTANCE.exports(STORE)["create_float_array"]
