@@ -7,7 +7,7 @@ This tests the Python wrapper around the WASM float vector functions.
 import pytest
 
 from python_src.common.wasm_handle import load_wasm_module
-from python_src.common.vector32 import VectorF32
+from python_src.common.vector_f32 import VectorF32
 
 
 STORE, INSTANCE = load_wasm_module("./emcc_wasm/build/mod.wasm")
