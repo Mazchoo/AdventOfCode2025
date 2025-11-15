@@ -177,7 +177,20 @@ namespace day00
             delete[] ptr;
         }
     }
-    
+ 
+    // Sums all elements in a raw uint8_t array (returns int to avoid overflow)
+    int sum_byte_array(uint8_t* ptr, int size) {
+        if (ptr == nullptr || size <= 0) {
+            return 0;
+        }
+
+        int sum = 0;
+        for (int i = 0; i < size; i++) {
+            sum += ptr[i];
+        }
+        return sum;
+    }
+
 #ifdef __EMSCRIPTEN__
     // SIMD-optimized version for WASM: Process 16 bytes at a time using 128-bit SIMD
     int sum_byte_array_simd(uint8_t* ptr, int size) {
@@ -236,19 +249,6 @@ namespace day00
         return sum_byte_array(ptr, size);
     }
 #endif
-
-    // Sums all elements in a raw uint8_t array (returns int to avoid overflow)
-    int sum_byte_array(uint8_t* ptr, int size) {
-        if (ptr == nullptr || size <= 0) {
-            return 0;
-        }
-
-        int sum = 0;
-        for (int i = 0; i < size; i++) {
-            sum += ptr[i];
-        }
-        return sum;
-    }
     
     // Sets a value at specified index in raw uint8_t array
     bool set_byte_array_element(uint8_t* ptr, int index, uint8_t value) {
