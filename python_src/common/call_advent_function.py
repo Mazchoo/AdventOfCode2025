@@ -1,12 +1,11 @@
 """Common wrapper around string sent to wasm"""
-
+import ctypes
 from typing import Callable, Optional
 from pathlib import Path
 
 from wasmtime import Store, Instance
 
 
-# ToDo - see if there is a more efficient way of doing this
 def get_payload_result(
     path: str, store: Store, instance: Instance, wasm_func: Callable
 ) -> Optional[int]:
@@ -24,10 +23,14 @@ def get_payload_result(
     result = None
 
     try:
-        # Write the string bytes to WASM memory
+        # Write the string bytes to WASM memory using ctypes.memmove for efficiency
         mem_data = memory.data_ptr(store)
-        for i, byte in enumerate(input_bytes):
-            mem_data[ptr + i] = byte
+
+        ctypes.memmove(
+            ctypes.c_void_p(ctypes.addressof(mem_data.contents) + ptr),
+            input_bytes,
+            input_len
+        )
 
         # Call the function with pointer and length
         result = wasm_func(store, ptr, input_len)
