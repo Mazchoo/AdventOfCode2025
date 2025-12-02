@@ -5,9 +5,19 @@
 #define EXPORT_FUNC
 #endif
 
+#include <string>
+
 #include "src/day00.hpp"
+#include "src/day01.hpp"
 
 extern "C" {
+    // Day01 part 1
+    EXPORT_FUNC
+    uint32_t count_total_zeros(const char* payload_ptr, int payload_len) {
+        std::string payload(payload_ptr, payload_len);
+        return day01::day01_pt1(payload);
+    }
+
     // Simple addition function
     EXPORT_FUNC
     int add(int a, int b) {

@@ -7,10 +7,33 @@ project(MathWasm VERSION 1.0.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Enable testing
+enable_testing()
+
+# Download doctest header if it doesn't exist
+set(DOCTEST_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/tests/doctest.h")
+if(NOT EXISTS ${DOCTEST_HEADER})
+    message(STATUS "Downloading doctest.h...")
+    file(DOWNLOAD
+        "https://raw.githubusercontent.com/doctest/doctest/v2.4.11/doctest/doctest.h"
+        ${DOCTEST_HEADER}
+        SHOW_PROGRESS
+        STATUS DOWNLOAD_STATUS
+    )
+    list(GET DOWNLOAD_STATUS 0 STATUS_CODE)
+    if(NOT STATUS_CODE EQUAL 0)
+        message(WARNING "Failed to download doctest.h automatically. Please download it manually from https://raw.githubusercontent.com/doctest/doctest/v2.4.11/doctest/doctest.h and place it in the tests/ directory.")
+    else()
+        message(STATUS "doctest.h downloaded successfully!")
+    endif()
+else()
+    message(STATUS "doctest.h already exists")
+endif()
+
 # Set the project GUID for Visual Studio (matches the existing .sln file)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-# Automatically find all source files, excluding CMake build directories
+# Automatically find all source files, excluding CMake build directories and tests
 file(GLOB_RECURSE SOURCES
     "*.cpp"
     "*.c"
@@ -28,6 +51,10 @@ list(FILTER HEADERS EXCLUDE REGEX "CMakeFiles/.*")
 # Also exclude any build directories
 list(FILTER SOURCES EXCLUDE REGEX "build/.*")
 list(FILTER HEADERS EXCLUDE REGEX "build/.*")
+
+# Exclude test files from main executable
+list(FILTER SOURCES EXCLUDE REGEX "tests/.*")
+list(FILTER HEADERS EXCLUDE REGEX "tests/.*")
 
 # Create the executable
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
@@ -101,4 +128,9 @@ set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "" FORCE)
 # Set default build type
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Choose the type of build." FORCE)
+endif()
+
+# Add tests subdirectory if it exists
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests")
+    add_subdirectory(tests)
 endif()

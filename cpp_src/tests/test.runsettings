@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <RunConfiguration>
+    <MaxCpuCount>1</MaxCpuCount>
+    <ResultsDirectory>.\TestResults</ResultsDirectory>
+    <TargetPlatform>x64</TargetPlatform>
+  </RunConfiguration>
+  
+  <!-- Adapter Specific sections -->
+  <TestAdaptersPaths>.</TestAdaptersPaths>
+  
+  <!-- Google Test Adapter settings (works with doctest too) -->
+  <GoogleTestAdapterSettings>
+    <SolutionSettings>
+      <Settings>
+        <DebugMode>true</DebugMode>
+        <TimestampOutput>true</TimestampOutput>
+        <ShowReleaseNotes>false</ShowReleaseNotes>
+      </Settings>
+    </SolutionSettings>
+  </GoogleTestAdapterSettings>
+</RunSettings>
