@@ -8,6 +8,7 @@ from python_src.common.wasm_handle import load_wasm_module
 
 STORE, INSTANCE = load_wasm_module("./emcc_wasm/build/mod.wasm")
 count_total_zeros = INSTANCE.exports(STORE)["count_total_zeros"]
+count_passing_zeros = INSTANCE.exports(STORE)["count_passing_zeros"]
 
 create_byte_array = INSTANCE.exports(STORE)["create_byte_array"]
 free_byte_array = INSTANCE.exports(STORE)["free_byte_array"]
@@ -53,6 +54,22 @@ def test_day01_pt1():
     path = "./python_src/day01/input/full.txt"
     result = get_payload_result(path, STORE, count_total_zeros)
     assert result == 1100
+
+
+def test_day01_pt2_sample():
+    """Test the count_passing_zeros function: count_passing_zeros(char*, int) -> uint32_t"""
+
+    path = "./python_src/day01/input/sample.txt"
+    result = get_payload_result(path, STORE, count_passing_zeros)
+    assert result == 6
+
+
+def test_day01_pt2():
+    """Test the count_total_zeros function: count_total_zeros(char*, int) -> uint32_t"""
+
+    path = "./python_src/day01/input/full.txt"
+    result = get_payload_result(path, STORE, count_passing_zeros)
+    assert result == 6358
 
 
 if __name__ == "__main__":

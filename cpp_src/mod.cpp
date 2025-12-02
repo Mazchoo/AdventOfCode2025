@@ -5,16 +5,23 @@
 #define EXPORT_FUNC
 #endif
 
-#include <string>
+#include <string_view>
 
 #include "src/day00.hpp"
 #include "src/day01.hpp"
 
 extern "C" {
+    // Day01 part 2
+    EXPORT_FUNC
+    uint32_t count_passing_zeros(const char* payload_ptr, int payload_len) {
+        std::string_view payload(payload_ptr, payload_len);
+        return day01::day01_pt2(payload);
+    }
+
     // Day01 part 1
     EXPORT_FUNC
     uint32_t count_total_zeros(const char* payload_ptr, int payload_len) {
-        std::string payload(payload_ptr, payload_len);
+        std::string_view payload(payload_ptr, payload_len);
         return day01::day01_pt1(payload);
     }
 
