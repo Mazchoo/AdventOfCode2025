@@ -54,4 +54,54 @@ namespace day02
     bool is_in_range(uint64_t value, const std::pair<uint64_t, uint64_t>& range) {
         return value >= range.first && value <= range.second;
     }
+
+    // Counts the number of base 10 digits in a uint64_t
+    // Uses binary search for optimal performance
+    // Returns 1 for value 0, otherwise returns the digit count
+    inline int count_digits(uint64_t value) {
+        if (value == 0) return 1;
+        
+        // Binary search through powers of 10
+        if (value < 10000) {
+            if (value < 100) {
+                return (value < 10) ? 1 : 2;
+            } else {
+                return (value < 1000) ? 3 : 4;
+            }
+        } else if (value < 100000000) {
+            if (value < 1000000) {
+                return (value < 100000) ? 5 : 6;
+            } else {
+                return (value < 10000000) ? 7 : 8;
+            }
+        } else if (value < 10000000000000ULL) {
+            if (value < 10000000000ULL) {
+                return (value < 1000000000) ? 9 : 10;
+            } else {
+                if (value < 100000000000ULL) {
+                    return 11;
+                } else {
+                    return (value < 1000000000000ULL) ? 12 : 13;
+                }
+            }
+        } else {
+            if (value < 1000000000000000ULL) {
+                return (value < 100000000000000ULL) ? 14 : 15;
+            } else {
+                if (value < 100000000000000000ULL) {
+                    if (value < 10000000000000000ULL) {
+                        return 16;
+                    } else {
+                        return 17;
+                    }
+                } else {
+                    if (value < 1000000000000000000ULL) {
+                        return 18;
+                    } else {
+                        return (value < 10000000000000000000ULL) ? 19 : 20;
+                    }
+                }
+            }
+        }
+    }
 }
