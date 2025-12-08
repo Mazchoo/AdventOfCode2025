@@ -9,8 +9,16 @@
 
 #include "src/day00.hpp"
 #include "src/day01.hpp"
+#include "src/day02.hpp"
 
 extern "C" {
+    // Day01 part 2
+    EXPORT_FUNC
+    uint32_t count_repeated_digits(const char* payload_ptr, int payload_len) {
+        std::string_view payload(payload_ptr, payload_len);
+        return day02::day02_pt1(payload);
+    }
+
     // Day01 part 2
     EXPORT_FUNC
     uint32_t count_passing_zeros(const char* payload_ptr, int payload_len) {

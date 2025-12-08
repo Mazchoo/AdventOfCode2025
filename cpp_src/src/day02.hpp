@@ -125,22 +125,22 @@ namespace day02
         return value * multiplier + value;
     }
 
-    uint32_t get_repeated_in_range(const std::pair<uint64_t, uint64_t> range) {
-        uint32_t result = 0;
+    uint64_t count_repeated_in_range(const std::pair<uint64_t, uint64_t> range) {
+        uint64_t result = 0;
         int nr_first_digits = count_digits(range.first);
 
         uint64_t current_value = 0;
         if (nr_first_digits % 2 == 0) {
             current_value = get_first_half_digits(range.first);
         } else {
-            current_value = std::pow(10, nr_first_digits/2 + 1);
+            current_value = std::pow(10, nr_first_digits/2);
         }
 
         while (true) {
             auto repeat_value = repeat_number(current_value++);
     
             if (is_in_range(repeat_value, range)) {
-                result++;
+                result += repeat_value;
             } else {
                 break;
             }
@@ -149,12 +149,12 @@ namespace day02
         return result;
     }
 
-    uint32_t get_number_repeated_digits(std::string_view payload) {
-        uint32_t result = 0;
+    uint64_t day02_pt1(std::string_view payload) {
+        uint64_t result = 0;
         auto ranges = parse_integer_pairs(payload);
 
         for (const auto& range: ranges)
-            result += get_repeated_in_range(range);
+            result += count_repeated_in_range(range);
 
         return result;
     }

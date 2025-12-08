@@ -5,6 +5,15 @@ using namespace day02;
 
 // Test suite for parse_integer_pairs function
 TEST_SUITE("Day02 Tests") {
+    TEST_CASE("day01_pt1 - sample input") {
+        std::string_view input = R"(11-22,95-115,998-1012,1188511880-1188511890,222220-222224,
+1698522-1698528,446443-446449,38593856-38593862,565653-565659,
+824824821-824824827,2121212118-2121212124)";
+        uint32_t result = day02_pt1(input);
+
+        CHECK(result == 1227775554);
+    }
+
     TEST_CASE("parse_integer_pairs - basic example") {
         std::string_view input = "1111-2222,3333-4444";
         std::vector<std::pair<uint64_t, uint64_t>> result = parse_integer_pairs(input);
@@ -78,5 +87,64 @@ TEST_SUITE("Day02 Tests") {
         
         // All same digits: 111111 (6 digits) -> 111
         CHECK(get_first_half_digits(111111) == 111);
+    }
+
+    TEST_CASE("repeat_number - basic examples") {
+        // 111 -> 111111
+        CHECK(repeat_number(111) == 111111);
+        
+        // 42 -> 4242
+        CHECK(repeat_number(42) == 4242);
+        
+        // Single digit: 7 -> 77
+        CHECK(repeat_number(7) == 77);
+        
+        // Larger number: 12345 -> 1234512345
+        CHECK(repeat_number(12345) == 1234512345ULL);
+    }
+
+    TEST_CASE("count_repeated_in_range 11-22 returns 2") {
+        std::pair<uint64_t, uint64_t> range = {11, 22};
+        CHECK(count_repeated_in_range(range) == 33);
+    }
+
+    TEST_CASE("count_repeated_in_range 95-115 returns 1") {
+        std::pair<uint64_t, uint64_t> range = { 95, 115 };
+        CHECK(count_repeated_in_range(range) == 99);
+    }
+
+    TEST_CASE("count_repeated_in_range 998-1012 returns 1") {
+        std::pair<uint64_t, uint64_t> range = { 998, 1012 };
+        CHECK(count_repeated_in_range(range) == 1010);
+    }
+
+    TEST_CASE("count_repeated_in_range 1188511880-1188511890 returns 1") {
+        std::pair<uint64_t, uint64_t> range = { 1188511880, 1188511890 };
+        CHECK(count_repeated_in_range(range) == 1188511885);
+    }
+
+    TEST_CASE("count_repeated_in_range 222220-222224 returns 1") {
+        std::pair<uint64_t, uint64_t> range = { 222220, 222224 };
+        CHECK(count_repeated_in_range(range) == 222222);
+    }
+
+    TEST_CASE("count_repeated_in_range 1698522-1698528 returns 1") {
+        std::pair<uint64_t, uint64_t> range = { 1698522, 1698528 };
+        CHECK(count_repeated_in_range(range) == 0);
+    }
+
+    TEST_CASE("count_repeated_in_range 3-14 returns 1") {
+        std::pair<uint64_t, uint64_t> range = { 3, 14 };
+        CHECK(count_repeated_in_range(range) == 11);
+    }
+
+    TEST_CASE("count_repeated_in_range 1-100 returns 1") {
+        std::pair<uint64_t, uint64_t> range = { 1, 100 };
+        CHECK(count_repeated_in_range(range) == 495);
+    }
+
+    TEST_CASE("count_repeated_in_range 446443-446449 returns 1") {
+        std::pair<uint64_t, uint64_t> range = { 446443, 446449 };
+        CHECK(count_repeated_in_range(range) == 446446);
     }
 }
