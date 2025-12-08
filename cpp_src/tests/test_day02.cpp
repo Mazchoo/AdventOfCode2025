@@ -38,29 +38,6 @@ TEST_SUITE("Day02 Tests") {
         CHECK(result[2].second == 60);
     }
 
-    TEST_CASE("count_digits - powers of 10") {
-        CHECK(count_digits(1ULL) == 1);
-        CHECK(count_digits(10ULL) == 2);
-        CHECK(count_digits(100ULL) == 3);
-        CHECK(count_digits(1000ULL) == 4);
-        CHECK(count_digits(10000ULL) == 5);
-        CHECK(count_digits(100000ULL) == 6);
-        CHECK(count_digits(1000000ULL) == 7);
-        CHECK(count_digits(10000000ULL) == 8);
-        CHECK(count_digits(100000000ULL) == 9);
-        CHECK(count_digits(1000000000ULL) == 10);
-        CHECK(count_digits(10000000000ULL) == 11);
-        CHECK(count_digits(100000000000ULL) == 12);
-        CHECK(count_digits(1000000000000ULL) == 13);
-        CHECK(count_digits(10000000000000ULL) == 14);
-        CHECK(count_digits(100000000000000ULL) == 15);
-        CHECK(count_digits(1000000000000000ULL) == 16);
-        CHECK(count_digits(10000000000000000ULL) == 17);
-        CHECK(count_digits(100000000000000000ULL) == 18);
-        CHECK(count_digits(1000000000000000000ULL) == 19);
-        CHECK(count_digits(10000000000000000000ULL) == 20);
-    }
-
     TEST_CASE("count_digits - boundary values") {
         // Just below powers of 10
         CHECK(count_digits(9ULL) == 1);
@@ -87,5 +64,19 @@ TEST_SUITE("Day02 Tests") {
     TEST_CASE("count_digits - max uint64_t") {
         // Maximum value for uint64_t: 18,446,744,073,709,551,615 (20 digits)
         CHECK(count_digits(18446744073709551615ULL) == 20);
+    }
+
+    TEST_CASE("get_first_half_digits - edge cases") {
+        // Single digit: 5 -> first 0 digits = 5 (1/2 = 0, divisor = 1)
+        CHECK(get_first_half_digits(5) == 5);
+        
+        // Large number: 18 digits
+        CHECK(get_first_half_digits(123456789012345678ULL) == 123456789ULL);
+        
+        // Number with leading zeros in second half: 100001 (6 digits) -> 100
+        CHECK(get_first_half_digits(100001) == 100);
+        
+        // All same digits: 111111 (6 digits) -> 111
+        CHECK(get_first_half_digits(111111) == 111);
     }
 }

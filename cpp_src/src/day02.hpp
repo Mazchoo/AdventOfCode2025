@@ -3,6 +3,7 @@
 #include <string_view>
 #include <utility>
 #include <cstdint>
+#include <cmath>
 
 namespace day02
 {
@@ -103,5 +104,58 @@ namespace day02
                 }
             }
         }
+    }
+
+    // Returns the first n/2 digits of a number
+    // For example: get_first_half_digits(123456) returns 123
+    // Uses pow to calculate 10^(n/2) as the divisor
+    inline uint64_t get_first_half_digits(uint64_t value) {
+        int n = count_digits(value);
+        int half = n / 2;
+        uint64_t divisor = static_cast<uint64_t>(std::pow(10, half));
+        return value / divisor;
+    }
+
+    // Repeats a number by concatenating it with itself
+    // For example: repeat_number(111) returns 111111
+    // For example: repeat_number(42) returns 4242
+    inline uint64_t repeat_number(uint64_t value) {
+        int digits = count_digits(value);
+        uint64_t multiplier = static_cast<uint64_t>(std::pow(10, digits));
+        return value * multiplier + value;
+    }
+
+    uint32_t get_repeated_in_range(const std::pair<uint64_t, uint64_t> range) {
+        uint32_t result = 0;
+        int nr_first_digits = count_digits(range.first);
+
+        uint64_t current_value = 0;
+        if (nr_first_digits % 2 == 0) {
+            current_value = get_first_half_digits(range.first);
+        } else {
+            current_value = std::pow(10, nr_first_digits/2 + 1);
+        }
+
+        while (true) {
+            auto repeat_value = repeat_number(current_value++);
+    
+            if (is_in_range(repeat_value, range)) {
+                result++;
+            } else {
+                break;
+            }
+        }
+
+        return result;
+    }
+
+    uint32_t get_number_repeated_digits(std::string_view payload) {
+        uint32_t result = 0;
+        auto ranges = parse_integer_pairs(payload);
+
+        for (const auto& range: ranges)
+            result += get_repeated_in_range(range);
+
+        return result;
     }
 }
