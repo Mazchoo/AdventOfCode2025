@@ -48,4 +48,10 @@ namespace day02
         
         return result;
     }
+
+    // Checks if a value is within the range defined by a pair (inclusive)
+    // Returns true if min <= value <= max, where min = pair.first, max = pair.second
+    bool is_in_range(uint64_t value, const std::pair<uint64_t, uint64_t>& range) {
+        return value >= range.first && value <= range.second;
+    }
 }
