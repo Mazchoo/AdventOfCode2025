@@ -13,38 +13,58 @@ namespace day02
     std::vector<std::pair<uint64_t, uint64_t>> parse_integer_pairs(std::string_view payload) {
         std::vector<std::pair<uint64_t, uint64_t>> result;
         
-        for (size_t i = 0; i < payload.length(); ) {
-            // Skip whitespace and line endings
-            if (payload[i] == ' ' || payload[i] == '\t' ||
-                payload[i] == '\r' || payload[i] == '\n') {
-                i++;
-                continue;
-            }
+        enum class State { SKIP_WHITESPACE, PARSE_FIRST, SKIP_DASH, PARSE_SECOND, SKIP_COMMA };
+        State state = State::SKIP_WHITESPACE;
+        uint64_t first = 0;
+        uint64_t second = 0;
+        
+        for (size_t i = 0; i < payload.length(); i++) {
+            char c = payload[i];
             
-            // Parse first number
-            uint64_t first = 0;
-            while (i < payload.length() && payload[i] >= '0' && payload[i] <= '9') {
-                first = first * 10 + (payload[i++] - '0');
+            if (state == State::SKIP_WHITESPACE) {
+                if (c == ' ' || c == '\t' || c == '\r' || c == '\n') {
+                    continue;
+                }
+                first = 0;
+                state = State::PARSE_FIRST;
+                i--; // Re-process this character in PARSE_FIRST state
             }
-            
-            // Skip the dash separator
-            if (i < payload.length() && payload[i] == '-') {
-                i++;
+            else if (state == State::PARSE_FIRST) {
+                if (c >= '0' && c <= '9') {
+                    first = first * 10 + (c - '0');
+                } else {
+                    state = State::SKIP_DASH;
+                    i--; // Re-process this character in SKIP_DASH state
+                }
             }
-            
-            // Parse second number
-            uint64_t second = 0;
-            while (i < payload.length() && payload[i] >= '0' && payload[i] <= '9') {
-                second = second * 10 + (payload[i++] - '0');
+            else if (state == State::SKIP_DASH) {
+                if (c == '-') {
+                    second = 0;
+                    state = State::PARSE_SECOND;
+                }
             }
-            
-            // Add the pair to result
+            else if (state == State::PARSE_SECOND) {
+                if (c >= '0' && c <= '9') {
+                    second = second * 10 + (c - '0');
+                } else {
+                    result.push_back({first, second});
+                    state = State::SKIP_COMMA;
+                    i--; // Re-process this character in SKIP_COMMA state
+                }
+            }
+            else if (state == State::SKIP_COMMA) {
+                if (c == ',') {
+                    state = State::SKIP_WHITESPACE;
+                } else {
+                    state = State::SKIP_WHITESPACE;
+                    i--; // Re-process this character in SKIP_WHITESPACE state
+                }
+            }
+        }
+        
+        // Handle the last pair if we ended while parsing the second number
+        if (state == State::PARSE_SECOND) {
             result.push_back({first, second});
-            
-            // Skip comma separator if present
-            if (i < payload.length() && payload[i] == ',') {
-                i++;
-            }
         }
         
         return result;

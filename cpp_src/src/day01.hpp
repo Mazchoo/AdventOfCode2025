@@ -11,27 +11,47 @@ namespace day01
     std::vector<int16_t> parse_safe_adjustments(std::string_view payload) {
         std::vector<int16_t> result;
         
-        for (size_t i = 0; i < payload.length(); ) {
-            // Skip whitespace and line endings
-            if (payload[i] == ' ' || payload[i] == '\t' ||
-                payload[i] == '\r' || payload[i] == '\n') {
-                i++;
-                continue;
-            }
+        enum class State { SKIP_WHITESPACE, READ_DIRECTION, PARSE_NUMBER };
+        State state = State::SKIP_WHITESPACE;
+        char direction = '\0';
+        int16_t value = 0;
+        
+        for (size_t i = 0; i < payload.length(); i++) {
+            char c = payload[i];
             
-            // Check direction (R or L)
-            char direction = payload[i++];
-            if (direction != 'R' && direction != 'L') {
-                continue;
+            if (state == State::SKIP_WHITESPACE) {
+                if (c == ' ' || c == '\t' || c == '\r' || c == '\n') {
+                    continue;
+                }
+                // Found non-whitespace, treat as direction
+                direction = c;
+                if (direction == 'R' || direction == 'L') {
+                    value = 0;
+                    state = State::PARSE_NUMBER;
+                }
+                // else stay in SKIP_WHITESPACE to skip invalid characters
             }
-            
-            // Parse the number
-            int16_t value = 0;
-            while (i < payload.length() && payload[i] >= '0' && payload[i] <= '9') {
-                value = value * 10 + (payload[i++] - '0');
+            else if (state == State::PARSE_NUMBER) {
+                if (c >= '0' && c <= '9') {
+                    value = value * 10 + (c - '0');
+                } else {
+                    result.push_back(direction == 'L' ? -value : value);
+                    state = State::SKIP_WHITESPACE;
+                    // Process current character as whitespace in next iteration
+                    if (c != ' ' && c != '\t' && c != '\r' && c != '\n') {
+                        // If it's not whitespace, it might be a direction
+                        direction = c;
+                        if (direction == 'R' || direction == 'L') {
+                            value = 0;
+                            state = State::PARSE_NUMBER;
+                        }
+                    }
+                }
             }
-            
-            // Apply direction and add to result
+        }
+        
+        // Handle the last value if we ended while parsing a number
+        if (state == State::PARSE_NUMBER) {
             result.push_back(direction == 'L' ? -value : value);
         }
         
