@@ -27,37 +27,39 @@ namespace day02
                 }
                 first = 0;
                 state = State::PARSE_FIRST;
-                i--; // Re-process this character in PARSE_FIRST state
             }
-            else if (state == State::PARSE_FIRST) {
+
+            if (state == State::PARSE_FIRST) {
                 if (c >= '0' && c <= '9') {
                     first = first * 10 + (c - '0');
+                    continue;
                 } else {
                     state = State::SKIP_DASH;
                     i--; // Re-process this character in SKIP_DASH state
                 }
             }
+
             else if (state == State::SKIP_DASH) {
                 if (c == '-') {
                     second = 0;
                     state = State::PARSE_SECOND;
+                    continue;
                 }
             }
-            else if (state == State::PARSE_SECOND) {
+
+            if (state == State::PARSE_SECOND) {
                 if (c >= '0' && c <= '9') {
                     second = second * 10 + (c - '0');
+                    continue;
                 } else {
                     result.push_back({first, second});
                     state = State::SKIP_COMMA;
-                    i--; // Re-process this character in SKIP_COMMA state
                 }
             }
-            else if (state == State::SKIP_COMMA) {
+
+            if (state == State::SKIP_COMMA) {
                 if (c == ',') {
                     state = State::SKIP_WHITESPACE;
-                } else {
-                    state = State::SKIP_WHITESPACE;
-                    i--; // Re-process this character in SKIP_WHITESPACE state
                 }
             }
         }
