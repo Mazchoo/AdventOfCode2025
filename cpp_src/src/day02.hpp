@@ -161,11 +161,11 @@ namespace day02
         while (true) {
             auto repeat_value = repeat_number(current_value++);
     
-            if (is_in_range(repeat_value, range)) {
+            if (is_in_range(repeat_value, range))
                 result += repeat_value;
-            } else {
+
+            if (repeat_value > range.second)
                 break;
-            }
         }
 
         return result;
