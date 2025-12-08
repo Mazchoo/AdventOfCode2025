@@ -1,9 +1,8 @@
+# Collect all test source files
+file(GLOB TEST_SOURCES "*.cpp")
+
 # Test executable
-add_executable(tests
-    test_main.cpp
-    test_day00.cpp
-    test_day01.cpp
-)
+add_executable(tests ${TEST_SOURCES})
 
 # Include directories
 target_include_directories(tests PRIVATE
