@@ -5,7 +5,6 @@
 #include <cstdint>
 #include <cmath>
 #include <algorithm>
-#include <optional>
 
 
 namespace day02

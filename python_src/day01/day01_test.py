@@ -11,7 +11,7 @@ count_passing_zeros = INSTANCE.exports(STORE)["count_passing_zeros"]
 
 
 def test_day01_pt1_sample():
-    """Test the count_total_zeros function: count_total_zeros(char*, int) -> uint32_t"""
+    """Test count_total_zeros(char*, int) -> uint32_t"""
 
     path = "./python_src/day01/input/sample.txt"
     result = get_payload_result(path, STORE, INSTANCE, count_total_zeros)
@@ -19,7 +19,7 @@ def test_day01_pt1_sample():
 
 
 def test_day01_pt1():
-    """Test the count_total_zeros function: count_total_zeros(char*, int) -> uint32_t"""
+    """Test count_total_zeros(char*, int) -> uint32_t"""
 
     path = "./python_src/day01/input/full.txt"
     result = get_payload_result(path, STORE, INSTANCE, count_total_zeros)
@@ -27,7 +27,7 @@ def test_day01_pt1():
 
 
 def test_day01_pt2_sample():
-    """Test the count_passing_zeros function: count_passing_zeros(char*, int) -> uint32_t"""
+    """Test count_passing_zeros(char*, int) -> uint32_t"""
 
     path = "./python_src/day01/input/sample.txt"
     result = get_payload_result(path, STORE, INSTANCE, count_passing_zeros)
@@ -35,7 +35,7 @@ def test_day01_pt2_sample():
 
 
 def test_day01_pt2():
-    """Test the count_total_zeros function: count_total_zeros(char*, int) -> uint32_t"""
+    """Test count_passing_zeros(char*, int) -> uint32_t"""
 
     path = "./python_src/day01/input/full.txt"
     result = get_payload_result(path, STORE, INSTANCE, count_passing_zeros)
