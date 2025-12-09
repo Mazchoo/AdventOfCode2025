@@ -4,6 +4,9 @@
 #include <utility>
 #include <cstdint>
 #include <cmath>
+#include <algorithm>
+#include <optional>
+
 
 namespace day02
 {
@@ -128,44 +131,87 @@ namespace day02
         }
     }
 
-    // Returns the first n/2 digits of a number
-    // For example: get_first_half_digits(123456) returns 123
-    // Uses pow to calculate 10^(n/2) as the divisor
-    inline uint64_t get_first_half_digits(uint64_t value) {
-        int n = count_digits(value);
-        int half = n / 2;
-        uint64_t divisor = static_cast<uint64_t>(std::pow(10, half));
+    // Returns the first digits/n digits of a number
+    // For example: get_first_nth_digits(123456, 2) returns 123 (first half)
+    // For example: get_first_nth_digits(123456, 3) returns 12 (first third)
+    // Uses pow to calculate 10^(digits/n) as the divisor
+    inline uint64_t get_first_nth_digits(uint64_t value, int n) {
+        int digits = count_digits(value);
+        int nth_part = digits - digits / n;
+        uint64_t divisor = static_cast<uint64_t>(std::pow(10, nth_part));
         return value / divisor;
     }
 
-    // Repeats a number by concatenating it with itself
-    // For example: repeat_number(111) returns 111111
-    // For example: repeat_number(42) returns 4242
-    inline uint64_t repeat_number(uint64_t value) {
+    // Repeats a number by concatenating it with itself n times
+    // For example: repeat_number(111, 2) returns 111111
+    // For example: repeat_number(42, 3) returns 424242
+    inline uint64_t repeat_number(uint64_t value, int n) {
+        if (n <= 0) return 0;
+        if (n == 1) return value;
+        
         int digits = count_digits(value);
         uint64_t multiplier = static_cast<uint64_t>(std::pow(10, digits));
-        return value * multiplier + value;
+        
+        uint64_t result = value;
+        for (int i = 1; i < n; i++) {
+            result = result * multiplier + value;
+        }
+        return result;
     }
 
-    uint64_t count_repeated_in_range(const std::pair<uint64_t, uint64_t> range) {
+    // Counts repeated numbers in a range without exclusions
+    // Sums all repeated numbers (e.g., 111, 222, etc.) that fall within the given range
+    uint64_t count_repeated_in_range(const std::pair<uint64_t, uint64_t> range, const int n) {
         uint64_t result = 0;
         int nr_first_digits = count_digits(range.first);
 
         uint64_t current_value = 0;
-        if (nr_first_digits % 2 == 0) {
-            current_value = get_first_half_digits(range.first);
+        if (nr_first_digits % n == 0) {
+            current_value = get_first_nth_digits(range.first, n);
         } else {
-            current_value = std::pow(10, nr_first_digits/2);
+            current_value = std::pow(10, nr_first_digits/n);
         }
 
         while (true) {
-            auto repeat_value = repeat_number(current_value++);
+            auto repeat_value = repeat_number(current_value++, n);
     
-            if (is_in_range(repeat_value, range))
+            if (is_in_range(repeat_value, range)) {
                 result += repeat_value;
-
-            if (repeat_value > range.second)
+            } else if (repeat_value > range.second) {
                 break;
+            }
+        }
+
+        return result;
+    }
+
+    // Counts repeated numbers in a range with exclusions tracking
+    // Sums repeated numbers that fall within the range, tracking them in the exclusions vector
+    // to avoid counting duplicates across multiple calls
+    uint64_t count_repeated_in_range_with_exclusions(const std::pair<uint64_t, uint64_t> range,
+                                                     const int n,
+                                                     std::vector<uint64_t>& exclusions) {
+        uint64_t result = 0;
+        int nr_first_digits = count_digits(range.first);
+
+        uint64_t current_value = 0;
+        if (nr_first_digits % n == 0) {
+            current_value = get_first_nth_digits(range.first, n);
+        } else {
+            current_value = std::pow(10, nr_first_digits/n);
+        }
+
+        while (true) {
+            auto repeat_value = repeat_number(current_value++, n);
+    
+            if (is_in_range(repeat_value, range)) {
+                if (std::find(exclusions.begin(), exclusions.end(), repeat_value) == exclusions.end()) {
+                    result += repeat_value;
+                    exclusions.push_back(repeat_value);
+                }
+            } else if (repeat_value > range.second) {
+                break;
+            }
         }
 
         return result;
@@ -176,7 +222,22 @@ namespace day02
         auto ranges = parse_integer_pairs(payload);
 
         for (const auto& range: ranges)
-            result += count_repeated_in_range(range);
+            result += count_repeated_in_range(range, 2);
+
+        return result;
+    }
+
+    uint64_t day02_pt2(std::string_view payload) {
+        uint64_t result = 0;
+        auto ranges = parse_integer_pairs(payload);
+
+        for (const auto& range : ranges) {
+            int max_digits = std::max(count_digits(range.first), count_digits(range.second));
+            std::vector<uint64_t> exclusions = {};
+
+            for (int i = 2; i <= max_digits; i++)
+                result += count_repeated_in_range_with_exclusions(range, i, exclusions);
+        }
 
         return result;
     }
