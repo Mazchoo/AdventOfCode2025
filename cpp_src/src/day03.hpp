@@ -48,4 +48,36 @@ namespace day03
 
         return result;
     }
+
+    // Find highest pair of digits in a line
+    uint32_t highest_digit_pair(const std::vector<uint8_t>& line) {
+        const size_t line_length = line.size();
+        if (line_length == 0) return 0;
+        if (line_length == 1) return static_cast<uint8_t>(line[0] * 10);
+
+        uint8_t first_digit = 0;
+        uint8_t second_digit = 0;
+        for (size_t i = 0; i < line_length; i++) {
+            uint8_t entry = line[i];
+            if (entry > first_digit && i < line_length - 1) {
+                first_digit = entry;
+                second_digit = 0;
+                continue;
+            }
+            if (entry > second_digit)
+                second_digit = entry;
+        }
+
+        return first_digit * 10 + second_digit;
+    }
+
+    uint32_t day03_pt1(std::string_view payload) {
+        uint64_t result = 0;
+        auto digit_lines = parse_digit_lines(payload);
+
+        for (const auto& line: digit_lines)
+            result += highest_digit_pair(line);
+
+        return result;
+    }
 }

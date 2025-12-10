@@ -5,6 +5,16 @@ using namespace day03;
 
 // Test suite for parse_digit_lines function
 TEST_SUITE("Day03 Tests") {
+    TEST_CASE("day03_pt1 - sample input") {
+        std::string_view input = R"(987654321111111
+811111111111119
+234234234234278
+818181911112111)";
+        uint32_t result = day03_pt1(input);
+
+        CHECK(result == 357);
+    }
+
     TEST_CASE("parse_digit_lines - basic example") {
         std::string_view input = "1234\n6789";
         std::vector<std::vector<uint8_t>> result = parse_digit_lines(input);
@@ -181,5 +191,33 @@ TEST_SUITE("Day03 Tests") {
         CHECK(result[1][0] == 4);
         CHECK(result[1][1] == 5);
         CHECK(result[1][2] == 6);
+    }
+
+    TEST_CASE("highest_digit_pair - highest digits at start") {
+        std::vector<uint8_t> input = { 9, 8, 7, 6 };
+
+        auto result = highest_digit_pair(input);
+        CHECK(result == 98);
+    }
+
+    TEST_CASE("highest_digit_pair - highest digits at start and end") {
+        std::vector<uint8_t> input = { 9, 5, 5, 8 };
+
+        auto result = highest_digit_pair(input);
+        CHECK(result == 98);
+    }
+
+    TEST_CASE("highest_digit_pair - highest digits at end") {
+        std::vector<uint8_t> input = { 4, 5, 7, 8 };
+
+        auto result = highest_digit_pair(input);
+        CHECK(result == 78);
+    }
+
+    TEST_CASE("highest_digit_pair - highest digits in middle") {
+        std::vector<uint8_t> input = { 8, 9, 1, 2, 1 };
+
+        auto result = highest_digit_pair(input);
+        CHECK(result == 92);
     }
 }

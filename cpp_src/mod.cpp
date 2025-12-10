@@ -10,9 +10,17 @@
 #include "src/day00.hpp"
 #include "src/day01.hpp"
 #include "src/day02.hpp"
+#include "src/day03.hpp"
 
 extern "C" {
-    // Day02 part 1
+    // Day03 part 1
+    EXPORT_FUNC
+    uint32_t get_highest_digit_pair(const char* payload_ptr, int payload_len) {
+        std::string_view payload(payload_ptr, payload_len);
+        return day03::day03_pt1(payload);
+    }
+
+    // Day02 part 2
     EXPORT_FUNC
     uint64_t count_all_repeated_digits(const char* payload_ptr, int payload_len) {
         std::string_view payload(payload_ptr, payload_len);
