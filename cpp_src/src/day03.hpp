@@ -1,5 +1,6 @@
 // Day03
 #include <vector>
+#include <array>
 #include <string_view>
 #include <utility>
 #include <cstdint>
@@ -36,7 +37,7 @@ namespace day03
                     // End of line - store the current line
                     if (!current_line.empty())
                         result.push_back(current_line);
-\
+
                     state = State::SKIP_WHITESPACE;
                 }
             }
@@ -72,11 +73,58 @@ namespace day03
     }
 
     uint32_t day03_pt1(std::string_view payload) {
-        uint64_t result = 0;
+        uint32_t result = 0;
         auto digit_lines = parse_digit_lines(payload);
 
         for (const auto& line: digit_lines)
             result += highest_digit_pair(line);
+
+        return result;
+    }
+
+        // Find highest pair of digits in a line
+    uint64_t highest_digit_12_digits(const std::vector<uint8_t>& line) {
+        const size_t line_length = line.size();
+        if (line_length <= 12) {
+            uint64_t total = 0;
+            for (int i = 0; i < 12; i++) {
+                total *= 10;
+                if (i < line_length)
+                    total += line[i];
+            }
+        }
+
+        std::array<uint8_t, 12> digits = {0};
+        for (size_t i = 0; i < line_length; i++) {
+            bool new_digit_found = false;
+            for (int j = 0; j < 12; j++) {
+                if (!new_digit_found) {
+                    if (line_length - i >= 12 - j) {
+                        if (line[i] > digits[j]) {
+                            digits[j] = line[i];
+                            new_digit_found = true;
+                        }
+                    }
+                } else {
+                    digits[j] = 0;
+                }
+            }
+        }
+
+        uint64_t total = 0;
+        for (int i = 0; i < 12; i++) {
+            total *= 10;
+            total += static_cast<uint64_t>(digits[i]);
+        }
+        return total;
+    }
+
+    uint64_t day03_pt2(std::string_view payload) {
+        uint64_t result = 0;
+        auto digit_lines = parse_digit_lines(payload);
+
+        for (const auto& line : digit_lines)
+            result += highest_digit_12_digits(line);
 
         return result;
     }

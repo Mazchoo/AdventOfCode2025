@@ -13,6 +13,13 @@
 #include "src/day03.hpp"
 
 extern "C" {
+    // Day03 part 2
+    EXPORT_FUNC
+    uint64_t get_highest_12_digits(const char* payload_ptr, int payload_len) {
+        std::string_view payload(payload_ptr, payload_len);
+        return day03::day03_pt2(payload);
+    }
+
     // Day03 part 1
     EXPORT_FUNC
     uint32_t get_highest_digit_pair(const char* payload_ptr, int payload_len) {
