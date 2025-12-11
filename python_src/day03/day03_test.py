@@ -39,7 +39,7 @@ def test_day02_pt2():
 
     path = "./python_src/day03/input/full.txt"
     result = get_payload_result(path, STORE, INSTANCE, get_highest_12_digits)
-    assert result == 3121910778619
+    assert result == 172664333119298
 
 
 if __name__ == "__main__":
