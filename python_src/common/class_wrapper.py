@@ -21,6 +21,7 @@ class WasmPtr:
         *args,
     ):
         self.store = store
+        self.instance = instance
         self.call_funcs = {name: instance.exports(store)[name] for name in call_names}
         self.handle = instance.exports(store)[create_name](store, *args)
         self.free_func = instance.exports(store)[free_name]

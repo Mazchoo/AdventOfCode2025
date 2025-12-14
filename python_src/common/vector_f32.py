@@ -7,6 +7,8 @@ from python_src.common.class_wrapper import WasmPtr
 class VectorF32(WasmPtr):
     """Wrapper around f32 vector on the wasm side"""
 
+    call_names = ("sum_float_vector", "set_vector_element", "get_vector_element")
+
     def __init__(self, store: Store, instance: Instance, size: int):
         """
         Create a new float vector with the specified size
@@ -16,13 +18,12 @@ class VectorF32(WasmPtr):
             instance: Wasmtime instance with exported functions
             size: Size of the vector to create
         """
-        call_names = ["sum_float_vector", "set_vector_element", "get_vector_element"]
 
         super().__init__(
             store,
             instance,
             "create_float_vector",
-            call_names,
+            self.call_names,
             "free_float_vector",
             size,
         )

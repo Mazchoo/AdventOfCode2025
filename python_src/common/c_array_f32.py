@@ -7,6 +7,8 @@ from python_src.common.class_wrapper import WasmPtr
 class CArrayF32(WasmPtr):
     """Wrapper around f32 C-style array on the wasm side"""
 
+    call_names = ("sum_float_array", "set_array_element", "get_array_element")
+
     def __init__(self, store: Store, instance: Instance, size: int):
         """
         Create a new float C array with the specified size
@@ -16,13 +18,12 @@ class CArrayF32(WasmPtr):
             instance: Wasmtime instance with exported functions
             size: Size of the array to create
         """
-        call_names = ["sum_float_array", "set_array_element", "get_array_element"]
 
         super().__init__(
             store,
             instance,
             "create_float_array",
-            call_names,
+            self.call_names,
             "free_float_array",
             size,
         )

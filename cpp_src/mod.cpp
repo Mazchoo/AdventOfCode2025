@@ -11,8 +11,83 @@
 #include "src/day01.hpp"
 #include "src/day02.hpp"
 #include "src/day03.hpp"
+#include "src/day04.hpp"
 
 extern "C" {
+    EXPORT_FUNC
+    void* create_image_day4(const char* payload_ptr, int payload_len) {
+        std::string_view payload(payload_ptr, payload_len);
+        return static_cast<void*>(day04::create_binary_image(payload));
+    }
+    
+    // Creates a new binary image with specified dimensions
+    EXPORT_FUNC
+    void* create_blank_image(int width, int height) {
+        return static_cast<void*>(day04::create_image_sized(width, height));
+    }
+    
+    // Frees memory allocated for a binary image
+    EXPORT_FUNC
+    void free_image(void* image) {
+        day04::free_binary_image(static_cast<day04::RollsImage*>(image));
+    }
+    
+    // Gets the pitch (width) of a binary image
+    EXPORT_FUNC
+    int get_image_pitch(void* image) {
+        return static_cast<int>(day04::get_image_pitch(static_cast<day04::RollsImage*>(image)));
+    }
+    
+    // Gets the height of a binary image
+    EXPORT_FUNC
+    int get_image_height(void* image) {
+        return static_cast<int>(day04::get_image_height(static_cast<day04::RollsImage*>(image)));
+    }
+    
+    // Gets the total size of an image
+    EXPORT_FUNC
+    int get_image_size(void* image) {
+        return static_cast<int>(day04::get_image_size(static_cast<day04::RollsImage*>(image)));
+    }
+    
+    // Gets a value at specified index in image
+    EXPORT_FUNC
+    uint8_t get_image_element(void* image, int index) {
+        return day04::get_image_element(static_cast<day04::RollsImage*>(image), index);
+    }
+    
+    // Sets a value at specified index in image
+    // Returns 1 for success, 0 for failure
+    EXPORT_FUNC
+    int set_image_element(void* image, int index, uint8_t value) {
+        return day04::set_image_element(static_cast<day04::RollsImage*>(image), index, value) ? 1 : 0;
+    }
+    
+    // Gets a pixel value at specified row and column in image
+    EXPORT_FUNC
+    uint8_t get_image_pixel(void* image, int row, int col) {
+        return day04::get_image_pixel(static_cast<day04::RollsImage*>(image), row, col);
+    }
+    
+    // Sets a pixel value at specified row and column in image
+    // Returns 1 for success, 0 for failure
+    EXPORT_FUNC
+    int set_image_pixel(void* image, int row, int col, uint8_t value) {
+        return day04::set_image_pixel(static_cast<day04::RollsImage*>(image), row, col, value) ? 1 : 0;
+    }
+    
+    // Gets raw data pointer from image (for numpy integration)
+    EXPORT_FUNC
+    uint8_t* get_image_data_ptr(void* image) {
+        return day04::get_image_data_ptr(static_cast<day04::RollsImage*>(image));
+    }
+    
+    // Applies remove_generation algorithm to an image
+    EXPORT_FUNC
+    bool remove_generation_from_image(void* image) {
+        day04::remove_generation_from_image(static_cast<day04::RollsImage*>(image));
+    }
+
     // Day03 part 2
     EXPORT_FUNC
     uint64_t get_highest_12_digits(const char* payload_ptr, int payload_len) {
