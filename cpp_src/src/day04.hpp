@@ -241,7 +241,7 @@ namespace day04
         return image->get_data_ptr();
     }
 
-    // Remove binary objects with fewer than four neighbours
+    // Remove cells with fewer than four neighbours
     // Image is edited in place
     // Returns true if any change was made
     bool remove_generation(std::vector<uint8_t>& image, size_t pitch) {
@@ -305,5 +305,25 @@ namespace day04
             return false;
 
         return remove_generation(image->get_data(), image->get_pitch());
+    }
+
+    // Remove cells designated for removal
+    // Returns number of cells removed
+    uint32_t remove_deal_cells(std::vector<uint8_t>& image, size_t pitch) {
+        uint32_t result = 0;
+        for (auto& pixel : image) {
+            if (pixel == 2) {
+                pixel = 0;
+                result++;
+            }
+        }
+        return result;
+    }
+
+    uint32_t remove_all_dead_cells(RollsImage* image) {
+        if (image == nullptr)
+            return false;
+
+        return remove_deal_cells(image->get_data(), image->get_pitch());
     }
 }

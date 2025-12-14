@@ -26,3 +26,12 @@ plt.show()
 rolls_image.remove_generation()
 plt.imshow(rolls_image.to_numpy(), cmap=cmap, norm=norm)
 plt.show()
+
+rolls_image = RollsImage.from_payload(STORE, INSTANCE, sample_input)
+i = 0
+while rolls_image.remove_dead_cells():
+    i += 1
+    print(f"Generation {i}")
+
+plt.imshow(rolls_image.to_numpy(), cmap=cmap, norm=norm)
+plt.show()

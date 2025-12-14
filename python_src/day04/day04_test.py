@@ -46,5 +46,17 @@ def test_RollsImage_remove_generation():
     assert (image_data == 2).sum() == 1486
 
 
+def test_RollsImage_remove_dead_cells_until_finished_sample_input():
+    """Test RollsImage.remove_dead_cells(), edits np.ndarry returns number removed"""
+
+    path = "./python_src/day04/input/sample.txt"
+    sample_input = Path(path).open(encoding="utf-8").read()
+    rolls_image = RollsImage.from_payload(STORE, INSTANCE, sample_input)
+
+    expected_removals = [13, 12, 7, 5, 2, 1, 1, 1, 1, 0]
+    for expected_nr in expected_removals:
+        assert rolls_image.remove_dead_cells() == expected_nr
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-x", "--verbose"])

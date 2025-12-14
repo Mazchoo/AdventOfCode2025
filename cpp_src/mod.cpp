@@ -14,6 +14,15 @@
 #include "src/day04.hpp"
 
 extern "C" {
+    // Removes a generation and returns cells removed & edits image in place
+    EXPORT_FUNC
+    uint32_t remove_dead_cells(void* image) {
+        auto cast_image = static_cast<day04::RollsImage*>(image);
+        if (!day04::remove_generation_from_image(cast_image))
+            return 0;
+        return day04::remove_all_dead_cells(cast_image);
+    }
+
     EXPORT_FUNC
     void* create_image_day4(const char* payload_ptr, int payload_len) {
         std::string_view payload(payload_ptr, payload_len);
