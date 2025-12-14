@@ -99,12 +99,16 @@ namespace day04
         }
     };
 
+    // NB - In a real application all operations can fail and raising errors
+    // means adding more controls, probably better returning error codes
+    // for everything and mapping error codes in a seperate file
+    //
     // Parses a binary image string into a single-dimension vector with pitch
     // Format: "..@@.@@@@.\n@@@.@.@.@@" where \n separates lines
     // Characters: '.' = 0 (off), '@' = 1 (on)
     // Returns: pair of (flattened image data, pitch/width)
     // e.g. "..@@\n@@.." would parse to ({0,0,1,1,1,1,0,0}, 4)
-    std::pair<std::vector<uint8_t>, size_t> parse_binary_image(std::string_view payload) {
+    std::pair<std::vector<uint8_t>, size_t> parse_rolls_image(std::string_view payload) {
         std::vector<uint8_t> result;
         size_t pitch = 0;
         
@@ -133,7 +137,6 @@ namespace day04
                     if (pitch == 0 && current_line_length > 0) {
                         pitch = current_line_length;
                     } else if (pitch != current_line_length) {
-                        // ToDo - throw exception here
                         return {{}, 0};
                     }
                     
@@ -156,19 +159,19 @@ namespace day04
     }
     
     // Factory function to create a BinaryImage from parsed data
-    RollsImage* create_binary_image(std::string_view payload) {
-        auto [data, pitch] = parse_binary_image(payload);
+    RollsImage* create_rolls_image(std::string_view payload) {
+        auto [data, pitch] = parse_rolls_image(payload);
         return new RollsImage(std::move(data), pitch);
     }
     
     // Factory function to create a BinaryImage with specified size
-    RollsImage* create_image_sized(size_t width, size_t height) {
+    RollsImage* create_rolls_image_sized(size_t width, size_t height) {
         std::vector<uint8_t> data(width * height, 0);
         return new RollsImage(std::move(data), width);
     }
     
     // Function to free a BinaryImage
-    void free_binary_image(RollsImage* image) {
+    void free_rolls_image(RollsImage* image) {
         if (image != nullptr) {
             delete image;
         }

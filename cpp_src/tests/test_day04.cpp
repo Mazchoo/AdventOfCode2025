@@ -7,7 +7,7 @@ using namespace day04;
 TEST_SUITE("Day04 Tests") {
     TEST_CASE("parse_binary_image - basic example from documentation") {
         std::string_view input = "..@@\n@@..";
-        auto [result, pitch] = parse_binary_image(input);
+        auto [result, pitch] = parse_rolls_image(input);
         
         REQUIRE(result.size() == 8);
         REQUIRE(pitch == 4);
@@ -27,7 +27,7 @@ TEST_SUITE("Day04 Tests") {
     
     TEST_CASE("parse_binary_image - single line") {
         std::string_view input = ".@.@.";
-        auto [result, pitch] = parse_binary_image(input);
+        auto [result, pitch] = parse_rolls_image(input);
         
         REQUIRE(result.size() == 5);
         REQUIRE(pitch == 5);
@@ -40,7 +40,7 @@ TEST_SUITE("Day04 Tests") {
     
     TEST_CASE("parse_binary_image - empty string") {
         std::string_view input = "";
-        auto [result, pitch] = parse_binary_image(input);
+        auto [result, pitch] = parse_rolls_image(input);
         
         CHECK(result.size() == 0);
         CHECK(pitch == 0);
@@ -48,7 +48,7 @@ TEST_SUITE("Day04 Tests") {
     
     TEST_CASE("parse_binary_image - single character dot") {
         std::string_view input = ".";
-        auto [result, pitch] = parse_binary_image(input);
+        auto [result, pitch] = parse_rolls_image(input);
         
         REQUIRE(result.size() == 1);
         REQUIRE(pitch == 1);
@@ -57,7 +57,7 @@ TEST_SUITE("Day04 Tests") {
     
     TEST_CASE("parse_binary_image - leading whitespace") {
         std::string_view input = "  .@@\n  @@.";
-        auto [result, pitch] = parse_binary_image(input);
+        auto [result, pitch] = parse_rolls_image(input);
         
         REQUIRE(result.size() == 6);
         REQUIRE(pitch == 3);
@@ -75,7 +75,7 @@ TEST_SUITE("Day04 Tests") {
     
     TEST_CASE("parse_binary_image - trailing newlines") {
         std::string_view input = ".@\n@.\n\n";
-        auto [result, pitch] = parse_binary_image(input);
+        auto [result, pitch] = parse_rolls_image(input);
         
         REQUIRE(result.size() == 4);
         REQUIRE(pitch == 2);
@@ -87,7 +87,7 @@ TEST_SUITE("Day04 Tests") {
     
     TEST_CASE("parse_binary_image - Windows line endings (CRLF)") {
         std::string_view input = ".@\r\n@.\r\n";
-        auto [result, pitch] = parse_binary_image(input);
+        auto [result, pitch] = parse_rolls_image(input);
         
         REQUIRE(result.size() == 4);
         REQUIRE(pitch == 2);
@@ -99,7 +99,7 @@ TEST_SUITE("Day04 Tests") {
     
     TEST_CASE("parse_binary_image - tabs and spaces") {
         std::string_view input = "\t.@\n  @.\t\n";
-        auto [result, pitch] = parse_binary_image(input);
+        auto [result, pitch] = parse_rolls_image(input);
         
         REQUIRE(result.size() == 4);
         REQUIRE(pitch == 2);
@@ -111,7 +111,7 @@ TEST_SUITE("Day04 Tests") {
     
     TEST_CASE("parse_binary_image - multiple consecutive newlines") {
         std::string_view input = ".@\n\n\n@.";
-        auto [result, pitch] = parse_binary_image(input);
+        auto [result, pitch] = parse_rolls_image(input);
         
         REQUIRE(result.size() == 4);
         REQUIRE(pitch == 2);
@@ -123,7 +123,7 @@ TEST_SUITE("Day04 Tests") {
     
     TEST_CASE("parse_binary_image - mixed whitespace") {
         std::string_view input = "  \n\t\n  .@@\n\n  @@.  \n\n";
-        auto [result, pitch] = parse_binary_image(input);
+        auto [result, pitch] = parse_rolls_image(input);
         
         REQUIRE(result.size() == 6);
         REQUIRE(pitch == 3);
@@ -141,7 +141,7 @@ TEST_SUITE("Day04 Tests") {
     
     TEST_CASE("parse_binary_image - inconsistent pitch") {
         std::string_view input = "..\n@@@";
-        auto [result, pitch] = parse_binary_image(input);
+        auto [result, pitch] = parse_rolls_image(input);
         
         REQUIRE(result.size() == 0);
         REQUIRE(pitch == 0);

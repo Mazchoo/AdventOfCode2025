@@ -17,19 +17,19 @@ extern "C" {
     EXPORT_FUNC
     void* create_image_day4(const char* payload_ptr, int payload_len) {
         std::string_view payload(payload_ptr, payload_len);
-        return static_cast<void*>(day04::create_binary_image(payload));
+        return static_cast<void*>(day04::create_rolls_image(payload));
     }
     
     // Creates a new binary image with specified dimensions
     EXPORT_FUNC
     void* create_blank_image(int width, int height) {
-        return static_cast<void*>(day04::create_image_sized(width, height));
+        return static_cast<void*>(day04::create_rolls_image_sized(width, height));
     }
     
     // Frees memory allocated for a binary image
     EXPORT_FUNC
     void free_image(void* image) {
-        day04::free_binary_image(static_cast<day04::RollsImage*>(image));
+        day04::free_rolls_image(static_cast<day04::RollsImage*>(image));
     }
     
     // Gets the pitch (width) of a binary image
