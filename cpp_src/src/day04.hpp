@@ -61,4 +61,57 @@ namespace day04
         
         return {result, pitch};
     }
+
+    // Remove binary objects with fewer than four neighbours
+    // Image is edited in place
+    void remove_generation(std::vector<uint8_t>& image, size_t pitch) {
+        if (pitch == 0)
+            return;
+
+        size_t row = 0;
+        size_t column = 0;
+        size_t height = image.size() / pitch;
+
+        for (auto& pixel : image) {
+            if (pixel == 1) {
+                int nr_neighbours = 0;
+                
+                // Check all 8 neighbors (up, down, left, right, and 4 diagonals)
+                // Top-left
+                if (row > 0 && column > 0 && image[(row - 1) * pitch + (column - 1)] > 0)
+                    nr_neighbours++;
+                // Top
+                if (row > 0 && image[(row - 1) * pitch + column] > 0)
+                    nr_neighbours++;
+                // Top-right
+                if (row > 0 && column < pitch - 1 && image[(row - 1) * pitch + (column + 1)] > 0)
+                    nr_neighbours++;
+                // Left
+                if (column > 0 && image[row * pitch + (column - 1)] > 0)
+                    nr_neighbours++;
+                // Right
+                if (column < pitch - 1 && image[row * pitch + (column + 1)] > 0)
+                    nr_neighbours++;
+                // Bottom-left
+                if (row < height - 1 && column > 0 && image[(row + 1) * pitch + (column - 1)] > 0)
+                    nr_neighbours++;
+                // Bottom
+                if (row < height - 1 && image[(row + 1) * pitch + column] > 0)
+                    nr_neighbours++;
+                // Bottom-right
+                if (row < height - 1 && column < pitch - 1 && image[(row + 1) * pitch + (column + 1)] > 0)
+                    nr_neighbours++;
+
+                if (nr_neighbours < 4)
+                    pixel = 2;
+            }
+
+
+            column += 1;
+            if (column == pitch) {
+                column = 0;
+                row += 1;
+            }
+        }
+    }
 }

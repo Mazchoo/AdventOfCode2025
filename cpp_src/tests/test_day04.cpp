@@ -146,4 +146,242 @@ TEST_SUITE("Day04 Tests") {
         REQUIRE(result.size() == 0);
         REQUIRE(pitch == 0);
     }
+    
+    // Test suite for remove_generation function
+    TEST_CASE("remove_generation - isolated pixel (0 neighbors)") {
+        std::vector<uint8_t> image = {
+            0, 0, 0,
+            0, 1, 0,
+            0, 0, 0
+        };
+        size_t pitch = 3;
+        
+        remove_generation(image, pitch);
+        
+        // Isolated pixel should be removed (set to 2)
+        CHECK(image[4] == 2);
+    }
+    
+    TEST_CASE("remove_generation - pixel with 1 neighbor") {
+        std::vector<uint8_t> image = {
+            0, 0, 0,
+            0, 1, 1,
+            0, 0, 0
+        };
+        size_t pitch = 3;
+        
+        remove_generation(image, pitch);
+        
+        // Both pixels have only 1 neighbor, should be removed
+        CHECK(image[4] == 2);
+        CHECK(image[5] == 2);
+    }
+    
+    TEST_CASE("remove_generation - pixel with 2 neighbors") {
+        std::vector<uint8_t> image = {
+            0, 1, 0,
+            0, 1, 1,
+            0, 0, 0
+        };
+        size_t pitch = 3;
+        
+        remove_generation(image, pitch);
+        
+        // All pixels have < 4 neighbors, should be removed
+        CHECK(image[1] == 2);  // top pixel (1 neighbor)
+        CHECK(image[4] == 2);  // middle pixel (2 neighbors)
+        CHECK(image[5] == 2);  // right pixel (2 neighbors)
+    }
+    
+    TEST_CASE("remove_generation - pixel with 3 neighbors") {
+        std::vector<uint8_t> image = {
+            0, 1, 0,
+            1, 1, 1,
+            0, 0, 0
+        };
+        size_t pitch = 3;
+        
+        remove_generation(image, pitch);
+        
+        // All pixels have < 4 neighbors, should be removed
+        CHECK(image[1] == 2);  // top pixel (2 neighbors)
+        CHECK(image[3] == 2);  // left pixel (2 neighbors)
+        CHECK(image[4] == 2);  // center pixel (3 neighbors)
+        CHECK(image[5] == 2);  // right pixel (2 neighbors)
+    }
+    
+    TEST_CASE("remove_generation - pixel with exactly 4 neighbors") {
+        std::vector<uint8_t> image = {
+            0, 1, 0,
+            1, 1, 1,
+            0, 1, 0
+        };
+        size_t pitch = 3;
+        
+        remove_generation(image, pitch);
+        
+        // Center pixel has exactly 4 neighbors, should NOT be removed
+        CHECK(image[4] == 1);
+        // Edge pixels have < 4 neighbors, should be removed
+        CHECK(image[1] == 2);  // top (2 neighbors)
+        CHECK(image[3] == 2);  // left (2 neighbors)
+        CHECK(image[5] == 2);  // right (2 neighbors)
+        CHECK(image[7] == 2);  // bottom (2 neighbors)
+    }
+    
+    TEST_CASE("remove_generation - pixel with 5+ neighbors") {
+        std::vector<uint8_t> image = {
+            1, 1, 1,
+            1, 1, 1,
+            0, 1, 0
+        };
+        size_t pitch = 3;
+        
+        remove_generation(image, pitch);
+        
+        // Center pixel has 5 neighbors, should NOT be removed
+        CHECK(image[4] == 1);
+        // Top-left has 3 neighbors
+        CHECK(image[0] == 2);
+        // Top-center has 4 neighbors, should NOT be removed
+        CHECK(image[1] == 1);
+        // Top-right has 3 neighbors
+        CHECK(image[2] == 2);
+    }
+    
+    TEST_CASE("remove_generation - all 8 neighbors (maximum)") {
+        std::vector<uint8_t> image = {
+            1, 1, 1,
+            1, 1, 1,
+            1, 1, 1
+        };
+        size_t pitch = 3;
+        
+        remove_generation(image, pitch);
+        
+        // Center pixel has 8 neighbors, should NOT be removed
+        CHECK(image[4] == 1);
+        // Corner pixels have 3 neighbors each, should be removed
+        CHECK(image[0] == 2);
+        CHECK(image[2] == 2);
+        CHECK(image[6] == 2);
+        CHECK(image[8] == 2);
+        // Edge pixels have 5 neighbors each, should NOT be removed
+        CHECK(image[1] == 1);
+        CHECK(image[3] == 1);
+        CHECK(image[5] == 1);
+        CHECK(image[7] == 1);
+    }
+    
+    TEST_CASE("remove_generation - edge cases at boundaries") {
+        std::vector<uint8_t> image = {
+            1, 1, 0, 0,
+            1, 1, 0, 0,
+            0, 0, 1, 1,
+            0, 0, 1, 1
+        };
+        size_t pitch = 4;
+        
+        remove_generation(image, pitch);
+        
+        // Top-left corner: each pixel has 3 neighbors
+        CHECK(image[0] == 2);
+        CHECK(image[1] == 2);
+        CHECK(image[4] == 2);
+
+        // four neighbors
+        CHECK(image[5] == 1);
+        CHECK(image[10] == 1);
+        
+        // Bottom-right block: each pixel has 3 neighbors
+        CHECK(image[11] == 2);
+        CHECK(image[14] == 2);
+        CHECK(image[15] == 2);
+    }
+    
+    TEST_CASE("remove_generation - diagonal neighbors count") {
+        std::vector<uint8_t> image = {
+            1, 0, 1, 0, 1,
+            0, 1, 0, 1, 0,
+            1, 0, 1, 0, 1,
+            0, 1, 0, 1, 0,
+            1, 0, 1, 0, 1
+        };
+        size_t pitch = 5;
+        
+        remove_generation(image, pitch);
+        
+        // Center pixel at (2,2) has 4 diagonal neighbors
+        CHECK(image[12] == 1);  // Should NOT be removed
+        
+        // Corner pixels have 1 neighbor each
+        CHECK(image[0] == 2);
+        CHECK(image[4] == 2);
+        CHECK(image[20] == 2);
+        CHECK(image[24] == 2);
+    }
+    
+    TEST_CASE("remove_generation - empty image") {
+        std::vector<uint8_t> image = {};
+        size_t pitch = 0;
+        
+        // Should not crash
+        remove_generation(image, pitch);
+        
+        CHECK(image.size() == 0);
+    }
+    
+    TEST_CASE("remove_generation - single pixel") {
+        std::vector<uint8_t> image = {1};
+        size_t pitch = 1;
+        
+        remove_generation(image, pitch);
+        
+        // Single pixel has 0 neighbors, should be removed
+        CHECK(image[0] == 2);
+    }
+    
+    TEST_CASE("remove_generation - all zeros") {
+        std::vector<uint8_t> image = {
+            0, 0, 0,
+            0, 0, 0,
+            0, 0, 0
+        };
+        size_t pitch = 3;
+        
+        remove_generation(image, pitch);
+        
+        // All pixels remain 0
+        for (auto pixel : image) {
+            CHECK(pixel == 0);
+        }
+    }
+    
+    TEST_CASE("remove_generation - rectangular image (non-square)") {
+        std::vector<uint8_t> image = {
+            1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1
+        };
+        size_t pitch = 5;
+        
+        remove_generation(image, pitch);
+        
+        // Interior pixels have 8 neighbors, should NOT be removed
+        CHECK(image[6] == 1);   // (1,1)
+        CHECK(image[7] == 1);   // (1,2)
+        CHECK(image[8] == 1);   // (1,3)
+        
+        // Corner pixels have 3 neighbors, should be removed
+        CHECK(image[0] == 2);   // top-left
+        CHECK(image[4] == 2);   // top-right
+        CHECK(image[10] == 2);  // bottom-left
+        CHECK(image[14] == 2);  // bottom-right
+        
+        // Edge pixels have 5 neighbors, should NOT be removed
+        CHECK(image[1] == 1);   // top edge
+        CHECK(image[5] == 1);   // left edge
+        CHECK(image[9] == 1);   // right edge
+        CHECK(image[11] == 1);  // bottom edge
+    }
 }
