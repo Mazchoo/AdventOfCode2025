@@ -297,10 +297,10 @@ namespace day04
     }
     
     // Wrapper function to apply remove_generation to a BinaryImage object
-    void remove_generation_from_image(RollsImage* image) {
-        if (image == nullptr) {
-            return;
-        }
-        remove_generation(image->get_data(), image->get_pitch());
+    bool remove_generation_from_image(RollsImage* image) {
+        if (image == nullptr)
+            return false;
+
+        return remove_generation(image->get_data(), image->get_pitch());
     }
 }

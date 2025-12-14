@@ -156,9 +156,10 @@ TEST_SUITE("Day04 Tests") {
         };
         size_t pitch = 3;
         
-        remove_generation(image, pitch);
+        bool changed = remove_generation(image, pitch);
         
         // Isolated pixel should be removed (set to 2)
+        CHECK(changed == true);
         CHECK(image[4] == 2);
     }
     
@@ -170,9 +171,10 @@ TEST_SUITE("Day04 Tests") {
         };
         size_t pitch = 3;
         
-        remove_generation(image, pitch);
+        bool changed = remove_generation(image, pitch);
         
         // Both pixels have only 1 neighbor, should be removed
+        CHECK(changed == true);
         CHECK(image[4] == 2);
         CHECK(image[5] == 2);
     }
@@ -185,9 +187,10 @@ TEST_SUITE("Day04 Tests") {
         };
         size_t pitch = 3;
         
-        remove_generation(image, pitch);
+        bool changed = remove_generation(image, pitch);
         
         // All pixels have < 4 neighbors, should be removed
+        CHECK(changed == true);
         CHECK(image[1] == 2);  // top pixel (1 neighbor)
         CHECK(image[4] == 2);  // middle pixel (2 neighbors)
         CHECK(image[5] == 2);  // right pixel (2 neighbors)
@@ -201,9 +204,10 @@ TEST_SUITE("Day04 Tests") {
         };
         size_t pitch = 3;
         
-        remove_generation(image, pitch);
+        bool changed = remove_generation(image, pitch);
         
         // All pixels have < 4 neighbors, should be removed
+        CHECK(changed == true);
         CHECK(image[1] == 2);  // top pixel (2 neighbors)
         CHECK(image[3] == 2);  // left pixel (2 neighbors)
         CHECK(image[4] == 2);  // center pixel (3 neighbors)
@@ -218,9 +222,10 @@ TEST_SUITE("Day04 Tests") {
         };
         size_t pitch = 3;
         
-        remove_generation(image, pitch);
+        bool changed = remove_generation(image, pitch);
         
         // Center pixel has exactly 4 neighbors, should NOT be removed
+        CHECK(changed == true);  // Edge pixels are removed
         CHECK(image[4] == 1);
         // Edge pixels have < 4 neighbors, should be removed
         CHECK(image[1] == 2);  // top (2 neighbors)
@@ -237,9 +242,10 @@ TEST_SUITE("Day04 Tests") {
         };
         size_t pitch = 3;
         
-        remove_generation(image, pitch);
+        bool changed = remove_generation(image, pitch);
         
         // Center pixel has 5 neighbors, should NOT be removed
+        CHECK(changed == true);  // Corner pixels are removed
         CHECK(image[4] == 1);
         // Top-left has 3 neighbors
         CHECK(image[0] == 2);
@@ -257,9 +263,10 @@ TEST_SUITE("Day04 Tests") {
         };
         size_t pitch = 3;
         
-        remove_generation(image, pitch);
+        bool changed = remove_generation(image, pitch);
         
         // Center pixel has 8 neighbors, should NOT be removed
+        CHECK(changed == true);  // Corner pixels are removed
         CHECK(image[4] == 1);
         // Corner pixels have 3 neighbors each, should be removed
         CHECK(image[0] == 2);
@@ -282,9 +289,10 @@ TEST_SUITE("Day04 Tests") {
         };
         size_t pitch = 4;
         
-        remove_generation(image, pitch);
+        bool changed = remove_generation(image, pitch);
         
         // Top-left corner: each pixel has 3 neighbors
+        CHECK(changed == true);  // Corner pixels are removed
         CHECK(image[0] == 2);
         CHECK(image[1] == 2);
         CHECK(image[4] == 2);
@@ -309,9 +317,10 @@ TEST_SUITE("Day04 Tests") {
         };
         size_t pitch = 5;
         
-        remove_generation(image, pitch);
+        bool changed = remove_generation(image, pitch);
         
         // Center pixel at (2,2) has 4 diagonal neighbors
+        CHECK(changed == true);  // Corner pixels are removed
         CHECK(image[12] == 1);  // Should NOT be removed
         
         // Corner pixels have 1 neighbor each
@@ -326,8 +335,9 @@ TEST_SUITE("Day04 Tests") {
         size_t pitch = 0;
         
         // Should not crash
-        remove_generation(image, pitch);
+        bool changed = remove_generation(image, pitch);
         
+        CHECK(changed == false);  // No changes possible in empty image
         CHECK(image.size() == 0);
     }
     
@@ -335,9 +345,10 @@ TEST_SUITE("Day04 Tests") {
         std::vector<uint8_t> image = {1};
         size_t pitch = 1;
         
-        remove_generation(image, pitch);
+        bool changed = remove_generation(image, pitch);
         
         // Single pixel has 0 neighbors, should be removed
+        CHECK(changed == true);
         CHECK(image[0] == 2);
     }
     
@@ -349,9 +360,10 @@ TEST_SUITE("Day04 Tests") {
         };
         size_t pitch = 3;
         
-        remove_generation(image, pitch);
+        bool changed = remove_generation(image, pitch);
         
         // All pixels remain 0
+        CHECK(changed == false);  // No changes made
         for (auto pixel : image) {
             CHECK(pixel == 0);
         }
@@ -365,9 +377,10 @@ TEST_SUITE("Day04 Tests") {
         };
         size_t pitch = 5;
         
-        remove_generation(image, pitch);
+        bool changed = remove_generation(image, pitch);
         
         // Interior pixels have 8 neighbors, should NOT be removed
+        CHECK(changed == true);  // Corner pixels are removed
         CHECK(image[6] == 1);   // (1,1)
         CHECK(image[7] == 1);   // (1,2)
         CHECK(image[8] == 1);   // (1,3)

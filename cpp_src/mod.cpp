@@ -85,7 +85,7 @@ extern "C" {
     // Applies remove_generation algorithm to an image
     EXPORT_FUNC
     bool remove_generation_from_image(void* image) {
-        day04::remove_generation_from_image(static_cast<day04::RollsImage*>(image));
+        return day04::remove_generation_from_image(static_cast<day04::RollsImage*>(image));
     }
 
     // Day03 part 2

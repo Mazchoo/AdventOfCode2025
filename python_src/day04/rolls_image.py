@@ -65,6 +65,6 @@ class RollsImage(Image):
 
         return img
 
-    def remove_generation(self):
+    def remove_generation(self) -> bool:
         """Apply remove_generation algorithm to the image"""
-        self("remove_generation_from_image")
+        return self("remove_generation_from_image")

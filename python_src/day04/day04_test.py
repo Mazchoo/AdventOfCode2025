@@ -26,9 +26,10 @@ def test_RollsImage_remove_generation_sample_input():
     path = "./python_src/day04/input/sample.txt"
     sample_input = Path(path).open(encoding="utf-8").read()
     rolls_image = RollsImage.from_payload(STORE, INSTANCE, sample_input)
-    rolls_image.remove_generation()
+    rolls_removed = rolls_image.remove_generation()
 
     image_data = rolls_image.to_numpy()
+    assert rolls_removed
     assert (image_data == 2).sum() == 13
 
 
@@ -38,9 +39,10 @@ def test_RollsImage_remove_generation():
     path = "./python_src/day04/input/full.txt"
     sample_input = Path(path).open(encoding="utf-8").read()
     rolls_image = RollsImage.from_payload(STORE, INSTANCE, sample_input)
-    rolls_image.remove_generation()
+    rolls_removed = rolls_image.remove_generation()
 
     image_data = rolls_image.to_numpy()
+    assert rolls_removed
     assert (image_data == 2).sum() == 1486
 
 
