@@ -12,8 +12,23 @@
 #include "src/day02.hpp"
 #include "src/day03.hpp"
 #include "src/day04.hpp"
+#include "src/day05.hpp"
 
 extern "C" {
+    // Day05 part 2
+    EXPORT_FUNC
+    uint64_t count_all_valid_ids(const char* payload_ptr, int payload_len) {
+        std::string_view payload(payload_ptr, payload_len);
+        return day05::count_all_valid_ids(payload);
+    }
+
+    // Day05 part 1
+    EXPORT_FUNC
+    uint32_t count_ids_in_range(const char* payload_ptr, int payload_len) {
+        std::string_view payload(payload_ptr, payload_len);
+        return day05::count_ids_in_range(payload);
+    }
+
     // Removes a generation and returns cells removed & edits image in place
     EXPORT_FUNC
     uint32_t remove_dead_cells(void* image) {
