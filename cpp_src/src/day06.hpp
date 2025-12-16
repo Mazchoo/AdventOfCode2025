@@ -85,4 +85,32 @@ namespace day06
         
         return {values, operations};
     }
+
+    // Total the result of every sum
+    uint64_t calculate_homework_total(std::string_view payload) {
+        auto values_and_ops = parse_values_and_operations(payload);
+        auto values = values_and_ops.first;
+        size_t nr_values = values.size();
+        auto operations = values_and_ops.second;
+
+        uint64_t result = 0;
+        for (size_t i = 0; i < operations.size(); i++) {
+            uint64_t sub_total = 0;
+            if (operations[i] == Operation::Multiply)
+                sub_total = 1;
+
+            for (size_t j = 0; j < nr_values; j++) {
+                // Assume all same length
+                if (operations[i] == Operation::Add) {
+                    sub_total += values[j][i];
+                } else {
+                    sub_total *= values[j][i];
+                }
+            }
+
+            result += sub_total;
+        }
+
+        return result;
+    }
 }

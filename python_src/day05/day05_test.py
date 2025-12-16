@@ -27,7 +27,7 @@ def test_day02_pt1():
     assert result == 517
 
 
-def test_day02_pt2_sample():
+def test_day05_pt2_sample():
     """Test get_payload_result(char*, int) -> uint64_t"""
 
     path = "./python_src/day05/input/sample.txt"
@@ -35,7 +35,7 @@ def test_day02_pt2_sample():
     assert result == 14
 
 
-def test_day02_pt2():
+def test_day05_pt2():
     """Test get_payload_result(char*, int) -> uint64_t"""
 
     path = "./python_src/day05/input/full.txt"

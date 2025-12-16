@@ -10,7 +10,7 @@ get_highest_digit_pair = INSTANCE.exports(STORE)["get_highest_digit_pair"]
 get_highest_12_digits = INSTANCE.exports(STORE)["get_highest_12_digits"]
 
 
-def test_day02_pt1_sample():
+def test_day03_pt1_sample():
     """Test get_highest_digit_pair(char*, int) -> uint32_t"""
 
     path = "./python_src/day03/input/sample.txt"
@@ -18,7 +18,7 @@ def test_day02_pt1_sample():
     assert result == 357
 
 
-def test_day02_pt1():
+def test_day03_pt1():
     """Test get_highest_digit_pair(char*, int) -> uint32_t"""
 
     path = "./python_src/day03/input/full.txt"
@@ -26,7 +26,7 @@ def test_day02_pt1():
     assert result == 17343
 
 
-def test_day02_pt2_sample():
+def test_day03_pt2_sample():
     """Test get_highest_digit_pair(char*, int) -> uint64_t"""
 
     path = "./python_src/day03/input/sample.txt"
@@ -34,7 +34,7 @@ def test_day02_pt2_sample():
     assert result == 3121910778619
 
 
-def test_day02_pt2():
+def test_day03_pt2():
     """Test get_highest_digit_pair(char*, int) -> uint64_t"""
 
     path = "./python_src/day03/input/full.txt"

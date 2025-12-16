@@ -13,8 +13,16 @@
 #include "src/day03.hpp"
 #include "src/day04.hpp"
 #include "src/day05.hpp"
+#include "src/day06.hpp"
 
 extern "C" {
+    // Day06 part 1
+    EXPORT_FUNC
+    uint64_t calculate_homework_total(const char* payload_ptr, int payload_len) {
+        std::string_view payload(payload_ptr, payload_len);
+        return day06::calculate_homework_total(payload);
+    }
+
     // Day05 part 2
     EXPORT_FUNC
     uint64_t count_all_valid_ids(const char* payload_ptr, int payload_len) {
