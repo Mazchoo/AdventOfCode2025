@@ -5,6 +5,48 @@ using namespace day06;
 
 // Test suite for parse_values_and_operations function
 TEST_SUITE("Day06 Tests") {
+    TEST_CASE("parse_column_values_and_operations - basic example from documentation") {
+        std::string_view input = R"(123 328  51 64 
+ 45 64  387 23 
+  6 98  215 314
+*   +   *   +  )";
+        auto [values, operations] = parse_column_values_and_operations(input);
+
+        REQUIRE(values.size() == 4);
+        REQUIRE(operations.size() == 4);
+        
+        // Check first row
+        REQUIRE(values[0].size() == 3);
+        CHECK(values[0][0] == 1);
+        CHECK(values[0][1] == 24);
+        CHECK(values[0][2] == 356);
+        
+        // Check second row
+        REQUIRE(values[1].size() == 3);
+        CHECK(values[1][0] == 369);
+        CHECK(values[1][1] == 248);
+        CHECK(values[1][2] == 8);
+        
+        // Check third row
+        REQUIRE(values[2].size() == 3);
+        CHECK(values[2][0] == 32);
+        CHECK(values[2][1] == 581);
+        CHECK(values[2][2] == 175);
+
+        // Check fourth row
+        REQUIRE(values[2].size() == 3);
+        CHECK(values[3][0] == 623);
+        CHECK(values[3][1] == 431);
+        CHECK(values[3][2] == 4);
+
+        // Check operations
+        CHECK(operations[0] == Operation::Multiply);
+        CHECK(operations[1] == Operation::Add);
+        CHECK(operations[2] == Operation::Multiply);
+        CHECK(operations[3] == Operation::Add);
+        
+    }
+
     TEST_CASE("parse_values_and_operations - basic example from documentation") {
         std::string_view input = R"(123 328  51 64 
  45 64  387 23 
