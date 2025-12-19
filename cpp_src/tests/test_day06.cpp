@@ -5,6 +5,15 @@ using namespace day06;
 
 // Test suite for parse_values_and_operations function
 TEST_SUITE("Day06 Tests") {
+    TEST_CASE("calculate_homework_total_vertical - basic example from documentation") {
+        std::string_view input = R"(123 328  51 64 
+ 45 64  387 23 
+  6 98  215 314
+*   +   *   +  )";
+        auto result = calculate_homework_total_vertical(input);
+        CHECK(result == 3263827);
+    }
+
     TEST_CASE("parse_column_values_and_operations - basic example from documentation") {
         std::string_view input = R"(123 328  51 64 
  45 64  387 23 

@@ -96,6 +96,11 @@ namespace day06
         return {values, operations};
     }
 
+    // Return true if char is on a line that is part of a sum
+    inline bool char_is_part_of_sum(char c) {
+        return c == ' ' || (c >= '0' && c <= '9');
+    }
+
     // Get the length of the first line (up to the first newline character)
     size_t get_line_length(std::string_view payload) {
         bool next_space = false;
@@ -103,7 +108,7 @@ namespace day06
             char c = payload[i];
             if (c == '\n' || c == '\r') {
                 next_space = true;
-            } else if (next_space && (payload[i] == ' ' || (c >= '0' && c <= '9'))) {
+            } else if (next_space && char_is_part_of_sum(c)) {
                 return i;
             }
         }
@@ -112,6 +117,7 @@ namespace day06
     }
 
     // Parses input containing columns of values and a final row of operations
+    // A fragile reading, but it is within the constraints of the problem
     // Format:
     //   123 328  51 64 
     //    45 64  387 23 
@@ -213,9 +219,8 @@ namespace day06
 
         // Total the result of every vertically
     uint64_t calculate_homework_total_vertical(std::string_view payload) {
-        auto values_and_ops = parse_values_and_operations(payload);
+        auto values_and_ops = parse_column_values_and_operations(payload);
         auto values = values_and_ops.first;
-        size_t nr_values = values.size();
         auto operations = values_and_ops.second;
 
         uint64_t result = 0;
@@ -224,24 +229,12 @@ namespace day06
             if (operations[i] == Operation::Multiply)
                 sub_total = 1;
 
-            int max_nr_digits = 0;
-            for (size_t j = 0; j < nr_values; j++)
-                max_nr_digits = std::max(count_digits(values[j][i]), max_nr_digits);
-    
-            for (size_t k = 0; k < max_nr_digits; k++) {
-                uint64_t new_value = 0;
-                for (size_t j = 0; j < nr_values; j++) {
-                    if (values[j][i] != 0) {
-                        new_value *= 10;
-                        new_value += values[j][i] % 10;
-                        values[j][i] /= 10;
-                    }
-                }
-
+            for (auto& value: values[i]) {
+                // Assume all same length
                 if (operations[i] == Operation::Add) {
-                    sub_total += new_value;
+                    sub_total += value;
                 } else {
-                    sub_total *= new_value;
+                    sub_total *= value;
                 }
             }
 

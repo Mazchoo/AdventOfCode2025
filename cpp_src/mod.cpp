@@ -16,6 +16,13 @@
 #include "src/day06.hpp"
 
 extern "C" {
+    // Day06 part 2
+    EXPORT_FUNC
+    uint64_t calculate_homework_total_vertical(const char* payload_ptr, int payload_len) {
+        std::string_view payload(payload_ptr, payload_len);
+        return day06::calculate_homework_total_vertical(payload);
+    }
+
     // Day06 part 1
     EXPORT_FUNC
     uint64_t calculate_homework_total(const char* payload_ptr, int payload_len) {
