@@ -40,7 +40,7 @@ def test_day06_pt2():
 
     path = "./python_src/day06/input/full.txt"
     result = get_payload_result(path, STORE, INSTANCE, calculate_homework_total_vertical)
-    assert result == 3263827
+    assert result == 11708563470209
 
 
 if __name__ == "__main__":
