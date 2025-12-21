@@ -7,7 +7,7 @@
 
 #include <string_view>
 
-#include "Image.hpp"
+#include "src/Image.hpp"
 #include "src/day00.hpp"
 #include "src/day01.hpp"
 #include "src/day02.hpp"
@@ -15,8 +15,23 @@
 #include "src/day04.hpp"
 #include "src/day05.hpp"
 #include "src/day06.hpp"
+#include "src/day07.hpp"
 
 extern "C" {
+    // Day07 part 1
+    EXPORT_FUNC
+    uint32_t simulate_splitting_lasers(void* image) {
+        auto cast_image = static_cast<Image*>(image);
+        return day07::simulate_splitting_lasers(cast_image);
+    }
+
+    // Day07 specific - Creates image from day07 payload
+    EXPORT_FUNC
+    void* create_image_day7(const char* payload_ptr, int payload_len) {
+        std::string_view payload(payload_ptr, payload_len);
+        return static_cast<void*>(day07::create_laser_image(payload));
+    }
+
     // Day06 part 2
     EXPORT_FUNC
     uint64_t calculate_homework_total_vertical(const char* payload_ptr, int payload_len) {
@@ -45,7 +60,7 @@ extern "C" {
         return day05::count_ids_in_range(payload);
     }
 
-    // Removes a generation and returns cells removed & edits image in place
+    // Day04 specific - Removes a generation and returns cells removed & edits image in place
     EXPORT_FUNC
     uint32_t remove_dead_cells(void* image) {
         auto cast_image = static_cast<Image*>(image);
@@ -54,75 +69,14 @@ extern "C" {
         return day04::remove_all_dead_cells(cast_image);
     }
 
+    // Day04 specific - Creates image from day04 payload
     EXPORT_FUNC
     void* create_image_day4(const char* payload_ptr, int payload_len) {
         std::string_view payload(payload_ptr, payload_len);
         return static_cast<void*>(day04::create_rolls_image(payload));
     }
     
-    // Creates a new binary image with specified dimensions
-    EXPORT_FUNC
-    void* create_blank_image(int width, int height) {
-        return static_cast<void*>(day04::create_rolls_image_sized(width, height));
-    }
-    
-    // Frees memory allocated for a binary image
-    EXPORT_FUNC
-    void free_image(void* image) {
-        ::free_image(static_cast<Image*>(image));
-    }
-    
-    // Gets the pitch (width) of a binary image
-    EXPORT_FUNC
-    int get_image_pitch(void* image) {
-        return static_cast<int>(day04::get_image_pitch(static_cast<Image*>(image)));
-    }
-    
-    // Gets the height of a binary image
-    EXPORT_FUNC
-    int get_image_height(void* image) {
-        return static_cast<int>(day04::get_image_height(static_cast<Image*>(image)));
-    }
-    
-    // Gets the total size of an image
-    EXPORT_FUNC
-    int get_image_size(void* image) {
-        return static_cast<int>(day04::get_image_size(static_cast<Image*>(image)));
-    }
-    
-    // Gets a value at specified index in image
-    EXPORT_FUNC
-    uint8_t get_image_element(void* image, int index) {
-        return day04::get_image_element(static_cast<Image*>(image), index);
-    }
-    
-    // Sets a value at specified index in image
-    // Returns 1 for success, 0 for failure
-    EXPORT_FUNC
-    int set_image_element(void* image, int index, uint8_t value) {
-        return day04::set_image_element(static_cast<Image*>(image), index, value) ? 1 : 0;
-    }
-    
-    // Gets a pixel value at specified row and column in image
-    EXPORT_FUNC
-    uint8_t get_image_pixel(void* image, int row, int col) {
-        return day04::get_image_pixel(static_cast<Image*>(image), row, col);
-    }
-    
-    // Sets a pixel value at specified row and column in image
-    // Returns 1 for success, 0 for failure
-    EXPORT_FUNC
-    int set_image_pixel(void* image, int row, int col, uint8_t value) {
-        return day04::set_image_pixel(static_cast<Image*>(image), row, col, value) ? 1 : 0;
-    }
-    
-    // Gets raw data pointer from image (for numpy integration)
-    EXPORT_FUNC
-    uint8_t* get_image_data_ptr(void* image) {
-        return day04::get_image_data_ptr(static_cast<Image*>(image));
-    }
-    
-    // Applies remove_generation algorithm to an image
+    // Day04 specific - Applies remove_generation algorithm to an image
     EXPORT_FUNC
     bool remove_generation_from_image(void* image) {
         return day04::remove_generation_from_image(static_cast<Image*>(image));
@@ -304,5 +258,80 @@ extern "C" {
     EXPORT_FUNC
     uint8_t get_byte_array_element(uint8_t* ptr, int index) {
         return day00::get_byte_array_element(ptr, index);
+    }
+    
+    // ============================================================================
+    // Generic Image Functions (using Image class directly)
+    // ============================================================================
+    
+    // Creates a new blank image with specified dimensions
+    EXPORT_FUNC
+    void* create_blank_image(int width, int height) {
+        std::vector<uint8_t> data(width * height, 0);
+        return static_cast<void*>(new Image(std::move(data), width));
+    }
+    
+    // Frees memory allocated for an image
+    EXPORT_FUNC
+    void free_image(void* image) {
+        ::free_image(static_cast<Image*>(image));
+    }
+    
+    // Gets the pitch (width) of an image
+    EXPORT_FUNC
+    int get_image_pitch(void* image) {
+        auto img = static_cast<Image*>(image);
+        return static_cast<int>(img->get_pitch());
+    }
+    
+    // Gets the height of an image
+    EXPORT_FUNC
+    int get_image_height(void* image) {
+        auto img = static_cast<Image*>(image);
+        return static_cast<int>(img->get_height());
+    }
+    
+    // Gets the total size of an image
+    EXPORT_FUNC
+    int get_image_size(void* image) {
+        auto img = static_cast<Image*>(image);
+        return static_cast<int>(img->get_size());
+    }
+    
+    // Gets a value at specified index in image
+    EXPORT_FUNC
+    uint8_t get_image_element(void* image, int index) {
+        auto img = static_cast<Image*>(image);
+        return img->get_element(static_cast<size_t>(index));
+    }
+    
+    // Sets a value at specified index in image
+    // Returns 1 for success, 0 for failure
+    EXPORT_FUNC
+    int set_image_element(void* image, int index, uint8_t value) {
+        auto img = static_cast<Image*>(image);
+        return img->set_element(static_cast<size_t>(index), value) ? 1 : 0;
+    }
+    
+    // Gets a pixel value at specified row and column in image
+    EXPORT_FUNC
+    uint8_t get_image_pixel(void* image, int row, int col) {
+        auto img = static_cast<Image*>(image);
+        return img->get_pixel(static_cast<size_t>(row), static_cast<size_t>(col));
+    }
+    
+    // Sets a pixel value at specified row and column in image
+    // Returns 1 for success, 0 for failure
+    EXPORT_FUNC
+    int set_image_pixel(void* image, int row, int col, uint8_t value) {
+        auto img = static_cast<Image*>(image);
+        return img->set_pixel(static_cast<size_t>(row), static_cast<size_t>(col), value) ? 1 : 0;
+    }
+    
+    // Gets raw data pointer from image (for numpy integration)
+    EXPORT_FUNC
+    uint8_t* get_image_data_ptr(void* image) {
+        auto img = static_cast<Image*>(image);
+        return img->get_data_ptr();
     }
 }

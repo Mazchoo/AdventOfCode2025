@@ -6,6 +6,8 @@
 #include <string_view>
 #include <utility>
 
+int MAX_ITERATIONS = 1'000'000;
+
 namespace day07
 {
     // Pixel state enum with zero-cost abstraction (stored as uint8_t)
@@ -90,6 +92,16 @@ namespace day07
         return {result, pitch};
     }
     
+    // Find the first location of PixelState::Start in the image
+    // Returns the index of the first Start pixel, or -1 if not found
+    inline size_t find_start_position(const std::vector<uint8_t>& data) {
+        for (size_t i = 0; i < data.size(); i++) {
+            if (data[i] == static_cast<uint8_t>(PixelState::Start))
+                return i;
+        }
+        return -1;
+    }
+    
     // Factory function to create an Image from parsed data
     Image* create_laser_image(std::string_view payload) {
         auto [data, pitch] = parse_laser_image(payload);
@@ -100,5 +112,58 @@ namespace day07
     Image* create_laser_image_sized(size_t width, size_t height) {
         std::vector<uint8_t> data(width * height, static_cast<uint8_t>(PixelState::Space));
         return new Image(std::move(data), width);
+    }
+
+    // Keep on iterating on the image until at rest or the max iterations has been reached
+    // return the number of times the laser was split
+    uint32_t simulate_splitting_lasers(Image* laser_image) {
+        uint32_t result = 0;
+        std::vector<size_t> current_idx = {find_start_position(laser_image->get_data())};
+        std::vector<size_t> new_idx = {};
+
+        if (current_idx[0] == -1)
+            return result;
+
+        int iteration = 0;
+        while (iteration < MAX_ITERATIONS) {
+            new_idx.clear();
+            bool any_change = false;
+
+            for (auto& ind: current_idx) {
+                auto new_ind = ind + laser_image->get_pitch();
+                if (new_ind >= laser_image->get_size())
+                    continue;
+    
+                auto new_pixel = laser_image->get_element(new_ind);
+                if (new_pixel == static_cast<uint8_t>(PixelState::Space)) {
+                    new_idx.push_back(new_ind);
+                    laser_image->set_element(new_ind, static_cast<uint8_t>(PixelState::Laser));
+                    any_change = true;
+                } else if (new_pixel == static_cast<uint8_t>(PixelState::Splitter)) {
+                    auto new_column = new_ind % laser_image->get_pitch();
+                    result++;
+                    if (new_column > 0 &&
+                        laser_image->get_element(new_ind - 1) == laser_image->get_element(new_ind)) {
+                        new_idx.push_back(new_ind - 1);
+                        laser_image->set_element(new_ind - 1, static_cast<uint8_t>(PixelState::Laser));
+                        any_change = true;
+                    }
+                    if (new_column < laser_image->get_pitch() - 1 &&
+                        laser_image->get_element(new_ind + 1) == static_cast<uint8_t>(PixelState::Space)) {
+                        new_idx.push_back(new_ind + 1);
+                        laser_image->set_element(new_ind + 1, static_cast<uint8_t>(PixelState::Laser));
+                        any_change = true;
+                    }
+                }
+            }
+
+            if (new_idx.size() == 0 || any_change == false)
+                break;
+
+            current_idx = new_idx;
+            iteration++;
+        }
+
+        return result;
     }
 }
