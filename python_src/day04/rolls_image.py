@@ -8,10 +8,7 @@ from python_src.common.call_advent_function import call_wasm_with_string
 class RollsImage(Image):
     """Day04-specific image wrapper with generation removal functionality"""
 
-    call_names = (
-        "remove_generation_from_image",
-        "remove_dead_cells"
-    )
+    call_names = ("remove_generation_from_image", "remove_dead_cells")
 
     def __init__(self, store: Store, instance: Instance, width: int, height: int):
         """
@@ -27,9 +24,7 @@ class RollsImage(Image):
         super().__init__(store, instance, width, height)
 
         # Add day04-specific function to call_funcs
-        self.call_funcs.update({
-            n: instance.exports(store)[n] for n in self.call_names
-        })
+        self.call_funcs.update({n: instance.exports(store)[n] for n in self.call_names})
 
     @classmethod
     def from_payload(
@@ -54,9 +49,7 @@ class RollsImage(Image):
         img.call_funcs = {
             name: instance.exports(store)[name] for name in Image.call_names
         }
-        img.call_funcs.update({
-            n: instance.exports(store)[n] for n in cls.call_names
-        })
+        img.call_funcs.update({n: instance.exports(store)[n] for n in cls.call_names})
 
         # Call create_image_day4 with payload using proper memory allocation
         create_func = instance.exports(store)["create_image_day4"]
