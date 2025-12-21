@@ -20,8 +20,8 @@ def test_LaserImage_produces_numpy_image():
     assert isinstance(laser_image.to_numpy(), np.ndarray)
 
 
-def test_RollsImage_remove_generation_sample_input():
-    """Test RollsImage.remove_generation(), edits np.ndarray in place"""
+def test_LaserImage_simulate_splitting_lasers_sample_input():
+    """Test LaserImage.simulate_splitting_lasers() returns result"""
 
     path = "./python_src/day07/input/sample.txt"
     sample_input = Path(path).open(encoding="utf-8").read()
@@ -31,8 +31,8 @@ def test_RollsImage_remove_generation_sample_input():
     assert result == 21
 
 
-def test_RollsImage_remove_generation():
-    """Test RollsImage.remove_generation(), edits np.ndarray in place"""
+def test_LaserImage_simulate_splitting_lasers():
+    """Test LaserImage.simulate_splitting_lasers() returns result"""
 
     path = "./python_src/day07/input/full.txt"
     sample_input = Path(path).open(encoding="utf-8").read()
@@ -40,6 +40,28 @@ def test_RollsImage_remove_generation():
     result = laser_image.simulate_splitting_lasers()
 
     assert result == 1579
+
+
+def test_LaserImage_calculate_nr_splitting_paths_sample_input():
+    """Test LaserImage.calculate_nr_splitting_paths() returns result"""
+
+    path = "./python_src/day07/input/sample.txt"
+    sample_input = Path(path).open(encoding="utf-8").read()
+    laser_image = LaserImage.from_payload(STORE, INSTANCE, sample_input)
+    result = laser_image.calculate_nr_splitting_paths()
+
+    assert result == 40
+
+
+def test_LaserImage_calculate_nr_splitting_pathslasers():
+    """Test LaserImage.calculate_nr_splitting_paths() returns result"""
+
+    path = "./python_src/day07/input/full.txt"
+    sample_input = Path(path).open(encoding="utf-8").read()
+    laser_image = LaserImage.from_payload(STORE, INSTANCE, sample_input)
+    result = laser_image.calculate_nr_splitting_paths()
+
+    assert result == 13418215871354
 
 
 if __name__ == "__main__":

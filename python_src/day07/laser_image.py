@@ -8,7 +8,7 @@ from python_src.common.call_advent_function import call_wasm_with_string
 class LaserImage(Image):
     """Day07-specific image wrapper with laser simulation functionality"""
 
-    call_names = ("simulate_splitting_lasers",)
+    call_names = ("simulate_splitting_lasers", "calculate_nr_splitting_paths")
 
     def __init__(self, store: Store, instance: Instance, width: int, height: int):
         """
@@ -64,5 +64,9 @@ class LaserImage(Image):
         return img
 
     def simulate_splitting_lasers(self) -> int:
-        """Apply remove_generation algorithm to the image"""
+        """Apply simulate_splitting_lasers algorithm to the image"""
         return self("simulate_splitting_lasers")
+
+    def calculate_nr_splitting_paths(self) -> int:
+        """Apply calculate_nr_splitting_paths algorithm to the image"""
+        return self("calculate_nr_splitting_paths")

@@ -170,4 +170,60 @@ namespace day07
 
         return result;
     }
+
+    uint64_t calculate_nr_splitting_paths(Image* laser_image) {
+        auto nr_rows = laser_image->get_height();
+        auto nr_cols = laser_image->get_pitch();
+        std::vector<uint64_t> solution_row(nr_rows * nr_cols, 0);
+    
+        const auto last_row_ind = (nr_rows - 1) * nr_cols;
+        for (size_t j = 0; j < nr_cols; j++) {
+            auto ind = last_row_ind + j;
+            if (laser_image->get_element(ind) == static_cast<uint8_t>(PixelState::Space)) {
+                solution_row[ind] = 1;
+            }
+        }
+        for (size_t j = 0; j < nr_cols; j++) {
+            auto ind = last_row_ind + j;
+            // Assume splitters are surrounded by spaces
+            if (laser_image->get_element(ind) == static_cast<uint8_t>(PixelState::Splitter)) {
+                if (j > 0) {
+                    solution_row[ind] += solution_row[ind - 1];
+                }
+                if (j < nr_cols - 1) {
+                    solution_row[ind] += solution_row[ind + 1];
+                }
+            }
+        }
+
+        for (size_t i = nr_rows - 2; i >= 0; i--) {
+            const auto row_ind = i * nr_cols;
+            const auto next_row_ind = (i + 1) * nr_cols;
+            for (size_t j = 0; j < nr_cols; j++) {
+                auto ind = row_ind + j;
+                if (laser_image->get_element(ind) == static_cast<uint8_t>(PixelState::Space)) {
+                    solution_row[ind] = solution_row[next_row_ind + j];
+                }
+                // Assumes there are atleast two rows
+                if (laser_image->get_element(ind) == static_cast<uint8_t>(PixelState::Start)) {
+                    return solution_row[next_row_ind + j];
+                }
+            }
+            for (size_t j = 0; j < nr_cols; j++) {
+                auto ind = row_ind + j;
+                // Assume splitters are surrounded by spaces
+                if (laser_image->get_element(ind) == static_cast<uint8_t>(PixelState::Splitter)) {
+                    if (j > 0) {
+                        solution_row[ind] += solution_row[ind - 1];
+                    }
+                    if (j < nr_cols - 1) {
+                        solution_row[ind] += solution_row[ind + 1];
+                    }
+                }
+            }
+
+        }
+
+        return 0;
+    }
 }

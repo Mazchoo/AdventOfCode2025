@@ -18,6 +18,13 @@
 #include "src/day07.hpp"
 
 extern "C" {
+    // Day07 part 2
+    EXPORT_FUNC
+    uint64_t calculate_nr_splitting_paths(void* image) {
+        auto cast_image = static_cast<Image*>(image);
+        return day07::calculate_nr_splitting_paths(cast_image);
+    }
+    
     // Day07 part 1
     EXPORT_FUNC
     uint32_t simulate_splitting_lasers(void* image) {
