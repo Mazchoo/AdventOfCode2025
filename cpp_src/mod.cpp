@@ -7,6 +7,7 @@
 
 #include <string_view>
 
+#include "Image.hpp"
 #include "src/day00.hpp"
 #include "src/day01.hpp"
 #include "src/day02.hpp"
@@ -47,7 +48,7 @@ extern "C" {
     // Removes a generation and returns cells removed & edits image in place
     EXPORT_FUNC
     uint32_t remove_dead_cells(void* image) {
-        auto cast_image = static_cast<day04::RollsImage*>(image);
+        auto cast_image = static_cast<Image*>(image);
         if (!day04::remove_generation_from_image(cast_image))
             return 0;
         return day04::remove_all_dead_cells(cast_image);
@@ -68,63 +69,63 @@ extern "C" {
     // Frees memory allocated for a binary image
     EXPORT_FUNC
     void free_image(void* image) {
-        day04::free_rolls_image(static_cast<day04::RollsImage*>(image));
+        ::free_image(static_cast<Image*>(image));
     }
     
     // Gets the pitch (width) of a binary image
     EXPORT_FUNC
     int get_image_pitch(void* image) {
-        return static_cast<int>(day04::get_image_pitch(static_cast<day04::RollsImage*>(image)));
+        return static_cast<int>(day04::get_image_pitch(static_cast<Image*>(image)));
     }
     
     // Gets the height of a binary image
     EXPORT_FUNC
     int get_image_height(void* image) {
-        return static_cast<int>(day04::get_image_height(static_cast<day04::RollsImage*>(image)));
+        return static_cast<int>(day04::get_image_height(static_cast<Image*>(image)));
     }
     
     // Gets the total size of an image
     EXPORT_FUNC
     int get_image_size(void* image) {
-        return static_cast<int>(day04::get_image_size(static_cast<day04::RollsImage*>(image)));
+        return static_cast<int>(day04::get_image_size(static_cast<Image*>(image)));
     }
     
     // Gets a value at specified index in image
     EXPORT_FUNC
     uint8_t get_image_element(void* image, int index) {
-        return day04::get_image_element(static_cast<day04::RollsImage*>(image), index);
+        return day04::get_image_element(static_cast<Image*>(image), index);
     }
     
     // Sets a value at specified index in image
     // Returns 1 for success, 0 for failure
     EXPORT_FUNC
     int set_image_element(void* image, int index, uint8_t value) {
-        return day04::set_image_element(static_cast<day04::RollsImage*>(image), index, value) ? 1 : 0;
+        return day04::set_image_element(static_cast<Image*>(image), index, value) ? 1 : 0;
     }
     
     // Gets a pixel value at specified row and column in image
     EXPORT_FUNC
     uint8_t get_image_pixel(void* image, int row, int col) {
-        return day04::get_image_pixel(static_cast<day04::RollsImage*>(image), row, col);
+        return day04::get_image_pixel(static_cast<Image*>(image), row, col);
     }
     
     // Sets a pixel value at specified row and column in image
     // Returns 1 for success, 0 for failure
     EXPORT_FUNC
     int set_image_pixel(void* image, int row, int col, uint8_t value) {
-        return day04::set_image_pixel(static_cast<day04::RollsImage*>(image), row, col, value) ? 1 : 0;
+        return day04::set_image_pixel(static_cast<Image*>(image), row, col, value) ? 1 : 0;
     }
     
     // Gets raw data pointer from image (for numpy integration)
     EXPORT_FUNC
     uint8_t* get_image_data_ptr(void* image) {
-        return day04::get_image_data_ptr(static_cast<day04::RollsImage*>(image));
+        return day04::get_image_data_ptr(static_cast<Image*>(image));
     }
     
     // Applies remove_generation algorithm to an image
     EXPORT_FUNC
     bool remove_generation_from_image(void* image) {
-        return day04::remove_generation_from_image(static_cast<day04::RollsImage*>(image));
+        return day04::remove_generation_from_image(static_cast<Image*>(image));
     }
 
     // Day03 part 2

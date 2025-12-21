@@ -1,102 +1,10 @@
 // Day04
+#include "Image.hpp"
 #include <vector>
 #include <string_view>
 
 namespace day04
 {
-    // Binary image class for WASM bindings
-    class RollsImage {
-    private:
-        std::vector<uint8_t> data;
-        size_t pitch;
-        
-    public:
-        // Constructor
-        RollsImage(std::vector<uint8_t> image_data, size_t image_pitch)
-            : data(std::move(image_data)), pitch(image_pitch) {}
-        
-        // Default constructor
-        RollsImage() : data(), pitch(0) {}
-        
-        // Get the image data
-        const std::vector<uint8_t>& get_data() const {
-            return data;
-        }
-        
-        // Get mutable image data
-        std::vector<uint8_t>& get_data() {
-            return data;
-        }
-        
-        // Get pitch (width)
-        size_t get_pitch() const {
-            return pitch;
-        }
-        
-        // Get height
-        size_t get_height() const {
-            if (pitch == 0) return 0;
-            return data.size() / pitch;
-        }
-        
-        // Get total size
-        size_t get_size() const {
-            return data.size();
-        }
-        
-        // Get element at index
-        uint8_t get_element(size_t index) const {
-            if (index >= data.size()) {
-                return 0;
-            }
-            return data[index];
-        }
-        
-        // Set element at index
-        bool set_element(size_t index, uint8_t value) {
-            if (index >= data.size()) {
-                return false;
-            }
-            data[index] = value;
-            return true;
-        }
-        
-        // Get element at row, column
-        uint8_t get_pixel(size_t row, size_t col) const {
-            if (pitch == 0 || col >= pitch) {
-                return 0;
-            }
-            size_t index = row * pitch + col;
-            if (index >= data.size()) {
-                return 0;
-            }
-            return data[index];
-        }
-        
-        // Set element at row, column
-        bool set_pixel(size_t row, size_t col, uint8_t value) {
-            if (pitch == 0 || col >= pitch) {
-                return false;
-            }
-            size_t index = row * pitch + col;
-            if (index >= data.size()) {
-                return false;
-            }
-            data[index] = value;
-            return true;
-        }
-        
-        // Get raw data pointer (for advanced use)
-        uint8_t* get_data_ptr() {
-            return data.data();
-        }
-        
-        // Get const raw data pointer
-        const uint8_t* get_data_ptr() const {
-            return data.data();
-        }
-    };
-
     // NB - In a real application all operations can fail and raising errors
     // means adding more controls, probably better returning error codes
     // for everything and mapping error codes in a seperate file
@@ -157,26 +65,24 @@ namespace day04
     }
     
     // Factory function to create a BinaryImage from parsed data
-    RollsImage* create_rolls_image(std::string_view payload) {
+    Image* create_rolls_image(std::string_view payload) {
         auto [data, pitch] = parse_rolls_image(payload);
-        return new RollsImage(std::move(data), pitch);
+        return new Image(std::move(data), pitch);
     }
     
     // Factory function to create a BinaryImage with specified size
-    RollsImage* create_rolls_image_sized(size_t width, size_t height) {
+    Image* create_rolls_image_sized(size_t width, size_t height) {
         std::vector<uint8_t> data(width * height, 0);
-        return new RollsImage(std::move(data), width);
+        return new Image(std::move(data), width);
     }
     
-    // Function to free a BinaryImage
-    void free_rolls_image(RollsImage* image) {
-        if (image != nullptr) {
-            delete image;
-        }
+    // Function to free a BinaryImage (uses generic free_image)
+    inline void free_rolls_image(Image* image) {
+        free_image(image);
     }
     
     // Function to get pitch from image pointer
-    size_t get_image_pitch(RollsImage* image) {
+    size_t get_image_pitch(Image* image) {
         if (image == nullptr) {
             return 0;
         }
@@ -184,7 +90,7 @@ namespace day04
     }
     
     // Function to get height from image pointer
-    size_t get_image_height(RollsImage* image) {
+    size_t get_image_height(Image* image) {
         if (image == nullptr) {
             return 0;
         }
@@ -192,7 +98,7 @@ namespace day04
     }
     
     // Function to get size from image pointer
-    size_t get_image_size(RollsImage* image) {
+    size_t get_image_size(Image* image) {
         if (image == nullptr) {
             return 0;
         }
@@ -200,7 +106,7 @@ namespace day04
     }
     
     // Function to get element via image pointer
-    uint8_t get_image_element(RollsImage* image, size_t index) {
+    uint8_t get_image_element(Image* image, size_t index) {
         if (image == nullptr) {
             return 0;
         }
@@ -208,7 +114,7 @@ namespace day04
     }
     
     // Function to set element via image pointer
-    bool set_image_element(RollsImage* image, size_t index, uint8_t value) {
+    bool set_image_element(Image* image, size_t index, uint8_t value) {
         if (image == nullptr) {
             return false;
         }
@@ -216,7 +122,7 @@ namespace day04
     }
     
     // Function to get pixel via image pointer
-    uint8_t get_image_pixel(RollsImage* image, size_t row, size_t col) {
+    uint8_t get_image_pixel(Image* image, size_t row, size_t col) {
         if (image == nullptr) {
             return 0;
         }
@@ -224,7 +130,7 @@ namespace day04
     }
     
     // Function to set pixel via image pointer
-    bool set_image_pixel(RollsImage* image, size_t row, size_t col, uint8_t value) {
+    bool set_image_pixel(Image* image, size_t row, size_t col, uint8_t value) {
         if (image == nullptr) {
             return false;
         }
@@ -232,7 +138,7 @@ namespace day04
     }
     
     // Function to get raw data pointer from image
-    uint8_t* get_image_data_ptr(RollsImage* image) {
+    uint8_t* get_image_data_ptr(Image* image) {
         if (image == nullptr) {
             return nullptr;
         }
@@ -298,7 +204,7 @@ namespace day04
     }
     
     // Wrapper function to apply remove_generation to a BinaryImage object
-    bool remove_generation_from_image(RollsImage* image) {
+    bool remove_generation_from_image(Image* image) {
         if (image == nullptr)
             return false;
 
@@ -318,7 +224,7 @@ namespace day04
         return result;
     }
 
-    uint32_t remove_all_dead_cells(RollsImage* image) {
+    uint32_t remove_all_dead_cells(Image* image) {
         if (image == nullptr)
             return false;
 
