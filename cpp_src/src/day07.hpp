@@ -101,9 +101,4 @@ namespace day07
         std::vector<uint8_t> data(width * height, static_cast<uint8_t>(PixelState::Space));
         return new Image(std::move(data), width);
     }
-    
-    // Function to free an Image (uses generic free_image)
-    inline void free_laser_image(Image* image) {
-        free_image(image);
-    }
 }
