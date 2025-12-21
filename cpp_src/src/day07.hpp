@@ -143,13 +143,17 @@ namespace day07
                     auto new_column = new_ind % laser_image->get_pitch();
                     result++;
                     if (new_column > 0 &&
-                        laser_image->get_element(new_ind - 1) == laser_image->get_element(new_ind)) {
+                        laser_image->get_element(new_ind - 1) == static_cast<uint8_t>(PixelState::Space)
+                    )
+                    {
                         new_idx.push_back(new_ind - 1);
                         laser_image->set_element(new_ind - 1, static_cast<uint8_t>(PixelState::Laser));
                         any_change = true;
                     }
                     if (new_column < laser_image->get_pitch() - 1 &&
-                        laser_image->get_element(new_ind + 1) == static_cast<uint8_t>(PixelState::Space)) {
+                        laser_image->get_element(new_ind + 1) == static_cast<uint8_t>(PixelState::Space)
+                    )
+                    {
                         new_idx.push_back(new_ind + 1);
                         laser_image->set_element(new_ind + 1, static_cast<uint8_t>(PixelState::Laser));
                         any_change = true;
