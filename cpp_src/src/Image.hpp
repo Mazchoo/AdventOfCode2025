@@ -13,7 +13,12 @@ private:
 public:
     // Constructor
     Image(std::vector<uint8_t> image_data, size_t image_pitch)
-        : data(std::move(image_data)), pitch(image_pitch) {}
+        : data(std::move(image_data)), pitch(image_pitch) {
+        auto image_pitch_remainder = data.size() % image_pitch;
+        if (image_pitch_remainder > 0) {
+            data.resize(data.size() + image_pitch - image_pitch_remainder);
+        }
+    }
     
     // Default constructor
     Image() : data(), pitch(0) {}
