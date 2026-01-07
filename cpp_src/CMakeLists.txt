@@ -30,6 +30,27 @@ else()
     message(STATUS "doctest.h already exists")
 endif()
 
+# Download nanoflann header if it doesn't exist
+set(NANOFLANN_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/external/nanoflann.hpp")
+if(NOT EXISTS ${NANOFLANN_HEADER})
+    message(STATUS "Downloading nanoflann.hpp...")
+    file(MAKE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/external")
+    file(DOWNLOAD
+        "https://raw.githubusercontent.com/jlblancoc/nanoflann/master/include/nanoflann.hpp"
+        ${NANOFLANN_HEADER}
+        SHOW_PROGRESS
+        STATUS DOWNLOAD_STATUS
+    )
+    list(GET DOWNLOAD_STATUS 0 STATUS_CODE)
+    if(NOT STATUS_CODE EQUAL 0)
+        message(WARNING "Failed to download nanoflann.hpp automatically. Please download it manually from https://raw.githubusercontent.com/jlblancoc/nanoflann/master/include/nanoflann.hpp and place it in the external/ directory.")
+    else()
+        message(STATUS "nanoflann.hpp downloaded successfully!")
+    endif()
+else()
+    message(STATUS "nanoflann.hpp already exists")
+endif()
+
 # Set the project GUID for Visual Studio (matches the existing .sln file)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
@@ -69,9 +90,10 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 )
 
 # Include current directory for headers
-target_include_directories(${PROJECT_NAME} PRIVATE 
+target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/external
 )
 
 # Set compiler options for different configurations

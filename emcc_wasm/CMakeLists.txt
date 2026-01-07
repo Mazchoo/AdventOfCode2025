@@ -11,11 +11,35 @@ if(NOT EMSCRIPTEN)
     message(FATAL_ERROR "This project requires Emscripten. Please use emcmake to configure.")
 endif()
 
+# Download nanoflann header if it doesn't exist
+set(NANOFLANN_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/../cpp_src/external/nanoflann.hpp")
+if(NOT EXISTS ${NANOFLANN_HEADER})
+    message(STATUS "Downloading nanoflann.hpp...")
+    file(MAKE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../cpp_src/external")
+    file(DOWNLOAD
+        "https://raw.githubusercontent.com/jlblancoc/nanoflann/master/include/nanoflann.hpp"
+        ${NANOFLANN_HEADER}
+        SHOW_PROGRESS
+        STATUS DOWNLOAD_STATUS
+    )
+    list(GET DOWNLOAD_STATUS 0 STATUS_CODE)
+    if(NOT STATUS_CODE EQUAL 0)
+        message(WARNING "Failed to download nanoflann.hpp automatically. Please download it manually from https://raw.githubusercontent.com/jlblancoc/nanoflann/master/include/nanoflann.hpp and place it in the ../cpp_src/external/ directory.")
+    else()
+        message(STATUS "nanoflann.hpp downloaded successfully!")
+    endif()
+else()
+    message(STATUS "nanoflann.hpp already exists")
+endif()
+
 # Define the executable
 add_executable(mod ../cpp_src/mod.cpp)
 
 # Add include directory for headers
-target_include_directories(mod PRIVATE ../cpp_src)
+target_include_directories(mod PRIVATE
+    ../cpp_src
+    ../cpp_src/external
+)
 
 # Set emscripten-specific flags for WASM
 set_target_properties(mod PROPERTIES

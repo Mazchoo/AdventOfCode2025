@@ -3,6 +3,8 @@
 
 #include <vector>
 #include <cstdint>
+#include <nanoflann.hpp>
+#include <cmath>
 
 // Generic point cloud class for storing 3D point data (int32_t coordinates)
 class PointCloud {
@@ -94,6 +96,16 @@ public:
     const int32_t* get_data_ptr() const {
         return data.data();
     }
+        inline size_t kdtree_get_point_count() const {
+        return data.size() / 3;
+    }
+
+    inline float kdtree_get_pt(size_t idx, size_t dim) const {
+        return float(data[idx * 3 + dim]);
+    }
+
+    template <class BBOX>
+    bool kdtree_get_bbox(BBOX&) const { return false; }
 };
 
 // Generic function to free a PointCloud
