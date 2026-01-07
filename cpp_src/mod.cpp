@@ -8,6 +8,7 @@
 #include <string_view>
 
 #include "src/Image.hpp"
+#include "src/PointCloud.hpp"
 #include "src/day00.hpp"
 #include "src/day01.hpp"
 #include "src/day02.hpp"
@@ -16,8 +17,16 @@
 #include "src/day05.hpp"
 #include "src/day06.hpp"
 #include "src/day07.hpp"
+#include "src/day08.hpp"
 
 extern "C" {
+    // Day08 specific - Creates point cloud from day08 payload
+    EXPORT_FUNC
+    void* create_point_cloud_day8(const char* payload_ptr, int payload_len) {
+        std::string_view payload(payload_ptr, payload_len);
+        return static_cast<void*>(day08::parse_coordinates(payload));
+    }
+
     // Day07 part 2
     EXPORT_FUNC
     uint64_t calculate_nr_splitting_paths(void* image) {
@@ -340,5 +349,73 @@ extern "C" {
     uint8_t* get_image_data_ptr(void* image) {
         auto img = static_cast<Image*>(image);
         return img->get_data_ptr();
+    }
+    
+    // ============================================================================
+    // Generic PointCloud Functions (using PointCloud class directly)
+    // ============================================================================
+    
+    // Creates a new blank point cloud with specified number of points
+    EXPORT_FUNC
+    void* create_blank_point_cloud(int num_points) {
+        std::vector<int32_t> data(num_points * 3, 0);
+        return static_cast<void*>(new PointCloud(std::move(data), num_points));
+    }
+    
+    // Frees memory allocated for a point cloud
+    EXPORT_FUNC
+    void free_point_cloud(void* cloud) {
+        ::free_point_cloud(static_cast<PointCloud*>(cloud));
+    }
+    
+    // Gets the number of points in a point cloud
+    EXPORT_FUNC
+    int get_point_cloud_num_points(void* cloud) {
+        auto pc = static_cast<PointCloud*>(cloud);
+        return static_cast<int>(pc->get_num_points());
+    }
+    
+    // Gets the total size of a point cloud (num_points * 3)
+    EXPORT_FUNC
+    int get_point_cloud_size(void* cloud) {
+        auto pc = static_cast<PointCloud*>(cloud);
+        return static_cast<int>(pc->get_size());
+    }
+    
+    // Gets a value at specified index in point cloud
+    EXPORT_FUNC
+    int32_t get_point_cloud_element(void* cloud, int index) {
+        auto pc = static_cast<PointCloud*>(cloud);
+        return pc->get_element(static_cast<size_t>(index));
+    }
+    
+    // Sets a value at specified index in point cloud
+    // Returns 1 for success, 0 for failure
+    EXPORT_FUNC
+    int set_point_cloud_element(void* cloud, int index, int32_t value) {
+        auto pc = static_cast<PointCloud*>(cloud);
+        return pc->set_element(static_cast<size_t>(index), value) ? 1 : 0;
+    }
+    
+    // Gets a coordinate value at specified point index and coordinate (0=x, 1=y, 2=z)
+    EXPORT_FUNC
+    int32_t get_point_cloud_point(void* cloud, int point_index, int coord) {
+        auto pc = static_cast<PointCloud*>(cloud);
+        return pc->get_point(static_cast<size_t>(point_index), static_cast<size_t>(coord));
+    }
+    
+    // Sets a coordinate value at specified point index and coordinate (0=x, 1=y, 2=z)
+    // Returns 1 for success, 0 for failure
+    EXPORT_FUNC
+    int set_point_cloud_point(void* cloud, int point_index, int coord, int32_t value) {
+        auto pc = static_cast<PointCloud*>(cloud);
+        return pc->set_point(static_cast<size_t>(point_index), static_cast<size_t>(coord), value) ? 1 : 0;
+    }
+    
+    // Gets raw data pointer from point cloud (for numpy integration)
+    EXPORT_FUNC
+    int32_t* get_point_cloud_data_ptr(void* cloud) {
+        auto pc = static_cast<PointCloud*>(cloud);
+        return pc->get_data_ptr();
     }
 }

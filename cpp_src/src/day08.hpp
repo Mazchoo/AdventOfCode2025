@@ -4,30 +4,30 @@
 #include <vector>
 #include <string_view>
 #include <cstdint>
+#include "PointCloud.hpp"
 
 namespace day08
 {
     // Structure to hold a 3D coordinate
     struct Coordinate3D {
-        uint32_t x;
-        uint32_t y;
-        uint32_t z;
+        int32_t x;
+        int32_t y;
+        int32_t z;
         
-        Coordinate3D(uint32_t x_, uint32_t y_, uint32_t z_) : x(x_), y(y_), z(z_) {}
+        Coordinate3D(int32_t x_, int32_t y_, int32_t z_) : x(x_), y(y_), z(z_) {}
     };
 
-    // Parses a list of 3D coordinates from a string
+    // Parses a list of 3D coordinates from a string and returns a PointCloud
     // Format: "162,817,812\n57,618,57\n906,360,560"
     // Each line contains three comma-separated integers representing x, y, z coordinates
-    // Returns: vector of Coordinate3D structures
-    std::vector<Coordinate3D> parse_coordinates(std::string_view payload) {
+    // Returns: PointCloud pointer containing the parsed coordinates
+    PointCloud* parse_coordinates(std::string_view payload) {
         std::vector<Coordinate3D> result;
         
         enum class State { SKIP_WHITESPACE, PARSE_X, PARSE_Y, PARSE_Z };
         State state = State::SKIP_WHITESPACE;
         
         int32_t x = 0, y = 0, z = 0;
-        bool is_negative = false;
         
         for (size_t i = 0; i < payload.length(); i++) {
             char c = payload[i];
@@ -41,7 +41,6 @@ namespace day08
                 y = 0;
                 z = 0;
                 state = State::PARSE_X;
-                continue;
             }
             
             if (state == State::PARSE_X) {
@@ -78,6 +77,15 @@ namespace day08
             result.emplace_back(x, y, z);
         }
         
-        return result;
+        // Convert to flat int32_t vector for PointCloud
+        std::vector<int32_t> data;
+        data.reserve(result.size() * 3);
+        for (const auto& coord : result) {
+            data.push_back(coord.x);
+            data.push_back(coord.y);
+            data.push_back(coord.z);
+        }
+        
+        return new PointCloud(std::move(data), result.size());
     }
 }
