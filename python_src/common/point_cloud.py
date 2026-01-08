@@ -12,7 +12,6 @@ class PointCloud(WasmPtr):
 
     call_names = (
         "get_point_cloud_size",
-        "get_point_cloud_num_points",
         "get_point_cloud_element",
         "set_point_cloud_element",
         "get_point_cloud_point",

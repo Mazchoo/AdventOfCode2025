@@ -359,7 +359,7 @@ extern "C" {
     EXPORT_FUNC
     void* create_blank_point_cloud(int num_points) {
         std::vector<int32_t> data(num_points * 3, 0);
-        return static_cast<void*>(new PointCloud(std::move(data), num_points));
+        return static_cast<void*>(new PointCloud(std::move(data)));
     }
     
     // Frees memory allocated for a point cloud

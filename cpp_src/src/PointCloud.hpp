@@ -10,20 +10,22 @@
 class PointCloud {
 private:
     std::vector<int32_t> data;  // Stores x, y, z coordinates sequentially
-    size_t num_points;
+    std::vector<std::pair<size_t, size_t>> edges;
     
 public:
     // Constructor
-    PointCloud(std::vector<int32_t> cloud_data, size_t point_count)
-        : data(std::move(cloud_data)), num_points(point_count) {
+    PointCloud(std::vector<int32_t> cloud_data)
+        : data(std::move(cloud_data)){
         // Ensure data size is a multiple of 3
-        if (data.size() != num_points * 3) {
-            data.resize(num_points * 3, 0);
+        auto remainder = data.size() % 3;
+        if (remainder > 0) {
+            data.resize(data.size() + 3 - remainder, 0);
         }
+        edges = {};
     }
     
     // Default constructor
-    PointCloud() : data(), num_points(0) {}
+    PointCloud() : data() {}
     
     // Get the point cloud data
     const std::vector<int32_t>& get_data() const {
@@ -37,7 +39,7 @@ public:
     
     // Get number of points
     size_t get_num_points() const {
-        return num_points;
+        return data.size() / 3;
     }
     
     // Get total size (num_points * 3)
@@ -64,7 +66,7 @@ public:
     
     // Get coordinate of a point (coord: 0=x, 1=y, 2=z)
     int32_t get_point(size_t point_index, size_t coord) const {
-        if (point_index >= num_points || coord >= 3) {
+        if (point_index >= data.size() / 3 || coord >= 3) {
             return 0;
         }
         size_t index = point_index * 3 + coord;
@@ -76,7 +78,7 @@ public:
     
     // Set coordinate of a point (coord: 0=x, 1=y, 2=z)
     bool set_point(size_t point_index, size_t coord, int32_t value) {
-        if (point_index >= num_points || coord >= 3) {
+        if (point_index >= data.size() / 3 || coord >= 3) {
             return false;
         }
         size_t index = point_index * 3 + coord;
@@ -87,21 +89,39 @@ public:
         return true;
     }
     
-    // Get raw data pointer (for advanced use)
-    int32_t* get_data_ptr() {
-        return data.data();
+    bool add_edge(size_t i, size_t j) {
+        if (i >= data.size() || j >= data.size()) {
+            return false;
+        }
+
+        edges.emplace_back(std::make_pair(i, j));
+        return true;
     }
-    
-    // Get const raw data pointer
+
+    bool has_edge(size_t i, size_t j) {
+        for (auto& edge: edges) {
+            if (edge.first == i && edge.second == j)
+                return true;
+            if (edge.first == j && edge.second == i)
+                return true;
+        }
+        return false;
+    }
+
+    std::vector<std::pair<size_t, size_t>>& get_edges() {
+        return edges;
+    }
+
     const int32_t* get_data_ptr() const {
         return data.data();
     }
-        inline size_t kdtree_get_point_count() const {
-        return data.size() / 3;
+
+    inline size_t kdtree_get_point_count() const {
+        return this->get_num_points();
     }
 
-    inline float kdtree_get_pt(size_t idx, size_t dim) const {
-        return float(data[idx * 3 + dim]);
+    inline double kdtree_get_pt(size_t idx, size_t dim) const {
+        return double(data[idx * 3 + dim]);
     }
 
     template <class BBOX>
