@@ -9,17 +9,18 @@ from python_src.day08.junction_boxes import JunctionBoxes
 
 STORE, INSTANCE = load_wasm_module("./emcc_wasm/build/mod.wasm")
 
-path = "./python_src/day08/input/sample.txt"
+path = "./python_src/day08/input/full.txt"
 sample_input = Path(path).open(encoding="utf-8").read()
 
 points = JunctionBoxes.from_payload(STORE, INSTANCE, sample_input)
-points.connect_closest_points(10)
+result = points.connect_closest_points(1000)
+print(result)
 edges = points.edges_to_numpy()
 
 pcd = o3d.geometry.PointCloud()
 pcd.points = o3d.utility.Vector3dVector(points)
 
-colors = [[1, 0, 0] for _ in range(len(edges))]
+colors = [[0, 0, 0] for _ in range(len(edges))]
 ls = o3d.geometry.LineSet(
     points=pcd.points,
     lines=o3d.utility.Vector2iVector(edges)
