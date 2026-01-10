@@ -31,7 +31,7 @@ TEST_SUITE("Day08 Tests") {
 
         REQUIRE(cloud != nullptr);
         auto result = connect_closest_points(cloud, 10);
-        CHECK(result == 0);  // x
+        CHECK(result == 40);
 
         free_point_cloud(cloud);
     }

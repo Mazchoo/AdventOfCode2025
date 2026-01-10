@@ -22,7 +22,7 @@ using KDTree = nanoflann::KDTreeSingleIndexAdaptor<
 namespace day08
 {
     struct EdgeInfo {
-        std::pair<size_t, size_t> edge;
+        std::pair<uint32_t, uint32_t> edge;
         double distance;
     };
 
@@ -93,10 +93,11 @@ namespace day08
         return new PointCloud(std::move(data));
     }
 
+    // Assumes size_t fits in uint32_t
     uint32_t connect_closest_points(PointCloud* point_cloud, uint32_t nr_connections) {
         size_t nr_points = point_cloud->get_num_points();
-        if (nr_points <= 1)
-            return 0;
+        if (nr_points < 3)
+            return 0; // Need to count the top three so doesn't make any sense if this is true
 
         KDTree index(
             3, *point_cloud, nanoflann::KDTreeSingleIndexAdaptorParams(10)
@@ -121,7 +122,10 @@ namespace day08
 
             index.findNeighbors(rs, query_pt);
             for (size_t j = 1; j < nr_points; j++) {
-                neighbour_distances.emplace_back(EdgeInfo{{i, idx[j]}, dists[j]});
+                neighbour_distances.emplace_back(EdgeInfo{{
+                    static_cast<uint32_t>(i),
+                    static_cast<uint32_t>(idx[j])},
+                dists[j]});
             }
         }
 
@@ -143,6 +147,38 @@ namespace day08
             }
         }
 
-        return 0;
+        std::vector<uint32_t> component_ids(nr_points);
+        for (size_t i = 0; i < nr_points; i++) {
+            component_ids[i] = static_cast<uint32_t>(i);
+        }
+        bool any_change = true;
+        while (any_change) {
+            any_change = false;
+            for (const auto& edge: point_cloud->get_edges()) {
+                if (component_ids[edge.first] != component_ids[edge.second]) {
+                    component_ids[edge.first] = std::max<uint32_t>(
+                        component_ids[edge.first],
+                        component_ids[edge.second]
+                    );
+                    component_ids[edge.second] = std::max<uint32_t>(
+                        component_ids[edge.first],
+                        component_ids[edge.second]
+                    );
+                    any_change = true;
+                }
+            }
+        }
+
+        std::vector<uint32_t> id_counts(nr_points, 0);
+        for (size_t i = 0; i < nr_points; i++) {
+            id_counts[component_ids[i]]++;
+        }
+        std::sort(id_counts.begin(), id_counts.end(), std::greater<uint32_t>());
+        uint32_t result = 1;
+        for (size_t i = 0; i < 3; i++) {
+            result *= id_counts[i];
+        }
+
+        return result;
     }
 }

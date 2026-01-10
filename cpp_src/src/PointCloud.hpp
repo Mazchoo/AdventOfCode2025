@@ -10,7 +10,7 @@
 class PointCloud {
 private:
     std::vector<int32_t> data;  // Stores x, y, z coordinates sequentially
-    std::vector<std::pair<size_t, size_t>> edges;
+    std::vector<std::pair<uint32_t, uint32_t>> edges;
     
 public:
     // Constructor
@@ -89,7 +89,7 @@ public:
         return true;
     }
     
-    bool add_edge(size_t i, size_t j) {
+    bool add_edge(uint32_t i, uint32_t j) {
         if (i >= data.size() || j >= data.size()) {
             return false;
         }
@@ -98,7 +98,7 @@ public:
         return true;
     }
 
-    bool has_edge(size_t i, size_t j) {
+    bool has_edge(uint32_t i, uint32_t j) {
         for (auto& edge: edges) {
             if (edge.first == i && edge.second == j)
                 return true;
@@ -108,7 +108,7 @@ public:
         return false;
     }
 
-    std::vector<std::pair<size_t, size_t>>& get_edges() {
+    std::vector<std::pair<uint32_t, uint32_t>>& get_edges() {
         return edges;
     }
 
