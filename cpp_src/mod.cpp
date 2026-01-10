@@ -20,6 +20,13 @@
 #include "src/day08.hpp"
 
 extern "C" {
+    // Day08 specific - Connects closest points in point cloud
+    EXPORT_FUNC
+    uint32_t connect_closest_points(void* cloud, uint32_t nr_connections) {
+        auto pc = static_cast<PointCloud*>(cloud);
+        return day08::connect_closest_points(pc, nr_connections);
+    }
+
     // Day08 specific - Creates point cloud from day08 payload
     EXPORT_FUNC
     void* create_point_cloud_day8(const char* payload_ptr, int payload_len) {
@@ -416,6 +423,23 @@ extern "C" {
     EXPORT_FUNC
     int32_t* get_point_cloud_data_ptr(void* cloud) {
         auto pc = static_cast<PointCloud*>(cloud);
-        return pc->get_data_ptr();
+        return const_cast<int32_t*>(pc->get_data_ptr());
+    }
+    
+    // Gets the number of edges in a point cloud
+    EXPORT_FUNC
+    int get_point_cloud_num_edges(void* cloud) {
+        auto pc = static_cast<PointCloud*>(cloud);
+        return static_cast<int>(pc->get_edges().size());
+    }
+    
+    // Gets raw edges data pointer from point cloud (for numpy integration)
+    // Returns pointer to flattened array of edge pairs as uint32_t
+    // Note: WASM uses 32-bit size_t, so we explicitly return uint32_t* for clarity
+    EXPORT_FUNC
+    uint32_t* get_point_cloud_edges_ptr(void* cloud) {
+        auto pc = static_cast<PointCloud*>(cloud);
+        auto& edges = pc->get_edges();
+        return reinterpret_cast<uint32_t*>(edges.data());
     }
 }

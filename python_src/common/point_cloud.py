@@ -17,6 +17,8 @@ class PointCloud(WasmPtr):
         "get_point_cloud_point",
         "set_point_cloud_point",
         "get_point_cloud_data_ptr",
+        "get_point_cloud_num_edges",
+        "get_point_cloud_edges_ptr",
     )
 
     def __init__(self, store: Store, instance: Instance, num_points: int):
@@ -131,6 +133,40 @@ class PointCloud(WasmPtr):
 
         return arr.copy()  # Return a copy to avoid memory issues
 
+    def edges_to_numpy(self) -> np.ndarray:
+        """
+        Get edges data as a numpy array
+
+        Returns:
+            2D numpy array of shape (num_edges, 2) with dtype uint32
+            Each row contains [first_vertex_index, second_vertex_index]
+            Note: WASM uses 32-bit size_t, so edges are stored as uint32
+        """
+        # Get the number of edges
+        num_edges = self("get_point_cloud_num_edges")
+
+        if num_edges == 0:
+            return np.array([], dtype=np.uint32).reshape(0, 2)
+
+        # Get the raw edges pointer
+        edges_ptr = self("get_point_cloud_edges_ptr")
+
+        # Get the memory from the instance
+        memory = self.instance.exports(self.store)["memory"]
+
+        # Create numpy array view of the WASM memory
+        memory_data = memory.data_ptr(self.store)
+
+        # Create a numpy array from the memory buffer using ctypes
+        # Each edge is a pair of uint32_t values (2 * num_edges total values)
+        # WASM uses 32-bit size_t, so we read as uint32
+        buffer_start = ctypes.addressof(memory_data.contents) + edges_ptr
+        buffer = (ctypes.c_uint32 * (num_edges * 2)).from_address(buffer_start)
+
+        arr = np.frombuffer(buffer, dtype=np.uint32).reshape(num_edges, 2)
+
+        return arr.copy()  # Return a copy to avoid memory issues
+
     def __len__(self) -> int:
         """Return the number of points in the cloud"""
         return self._num_points
@@ -145,7 +181,9 @@ class PointCloud(WasmPtr):
         """
         if isinstance(value, (tuple, list)):
             if len(value) != 3:
-                raise ValueError("Point cloud point must have exactly 3 coordinates (x, y, z)")
+                raise ValueError(
+                    "Point cloud point must have exactly 3 coordinates (x, y, z)"
+                )
             x, y, z = value
             success = self.set_point(key, x, y, z)
             if success == 0:
@@ -155,7 +193,9 @@ class PointCloud(WasmPtr):
         else:
             success = self.set_element(key, value)
             if success == 0:
-                raise IndexError(f"Point cloud element index {key} out of range for size {self.size}")
+                raise IndexError(
+                    f"Point cloud element index {key} out of range for size {self.size}"
+                )
 
     def __getitem__(self, key):
         """

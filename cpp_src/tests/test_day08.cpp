@@ -30,7 +30,7 @@ TEST_SUITE("Day08 Tests") {
         PointCloud* cloud = parse_coordinates(input);
 
         REQUIRE(cloud != nullptr);
-        auto result = get_nr_connected_components(cloud);
+        auto result = connect_closest_points(cloud, 10);
         CHECK(result == 0);  // x
 
         free_point_cloud(cloud);

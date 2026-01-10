@@ -25,12 +25,31 @@ def load_wasm_module(wasm_path: str) -> Tuple[Store, Instance]:
     print(f"Module imports: {[(imp.module, imp.name, imp.type) for imp in imports]}")
 
     def notify_memory_growth(memory_index: int):
-        # Emscripten usually just updates JS-side views; no-op in Wasmtime
         pass
 
-    notify_func = Func(store, FuncType([ValType.i32()], []), notify_memory_growth)
+    def fd_close(fd: int) -> int:
+        return 0
 
-    instance = Instance(store, module, [notify_func])
+    def fd_write(fd: int, iovs: int, iovs_len: int, nwritten: int) -> int:
+        return 0
+
+    def fd_seek(fd: int, offset: int, whence: int, newoffset: int) -> int:
+        return 0
+
+    notify_func = Func(store, FuncType([ValType.i32()], []), notify_memory_growth)
+    fd_close_func = Func(store, FuncType([ValType.i32()], [ValType.i32()]), fd_close)
+    fd_write_func = Func(
+        store,
+        FuncType([ValType.i32(), ValType.i32(), ValType.i32(), ValType.i32()], [ValType.i32()]),
+        fd_write
+    )
+    fd_seek_func = Func(
+        store,
+        FuncType([ValType.i32(), ValType.i64(), ValType.i32(), ValType.i32()], [ValType.i32()]),
+        fd_seek
+    )
+
+    instance = Instance(store, module, [notify_func, fd_close_func, fd_write_func, fd_seek_func])
 
     print(
         f"Module loaded successfully. Exports: {list(instance.exports(store).keys())}"

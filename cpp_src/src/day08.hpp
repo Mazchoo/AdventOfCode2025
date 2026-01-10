@@ -93,7 +93,7 @@ namespace day08
         return new PointCloud(std::move(data));
     }
 
-    uint32_t get_nr_connected_components(PointCloud* point_cloud, uint32_t nr_connections) {
+    uint32_t connect_closest_points(PointCloud* point_cloud, uint32_t nr_connections) {
         size_t nr_points = point_cloud->get_num_points();
         if (nr_points <= 1)
             return 0;
