@@ -40,16 +40,24 @@ def load_wasm_module(wasm_path: str) -> Tuple[Store, Instance]:
     fd_close_func = Func(store, FuncType([ValType.i32()], [ValType.i32()]), fd_close)
     fd_write_func = Func(
         store,
-        FuncType([ValType.i32(), ValType.i32(), ValType.i32(), ValType.i32()], [ValType.i32()]),
-        fd_write
+        FuncType(
+            [ValType.i32(), ValType.i32(), ValType.i32(), ValType.i32()],
+            [ValType.i32()],
+        ),
+        fd_write,
     )
     fd_seek_func = Func(
         store,
-        FuncType([ValType.i32(), ValType.i64(), ValType.i32(), ValType.i32()], [ValType.i32()]),
-        fd_seek
+        FuncType(
+            [ValType.i32(), ValType.i64(), ValType.i32(), ValType.i32()],
+            [ValType.i32()],
+        ),
+        fd_seek,
     )
 
-    instance = Instance(store, module, [notify_func, fd_close_func, fd_write_func, fd_seek_func])
+    instance = Instance(
+        store, module, [notify_func, fd_close_func, fd_write_func, fd_seek_func]
+    )
 
     print(
         f"Module loaded successfully. Exports: {list(instance.exports(store).keys())}"

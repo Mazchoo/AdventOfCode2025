@@ -2,11 +2,13 @@
 #pragma once
 
 #include <vector>
+#include <algorithm>
 #include <cstdint>
 #include <nanoflann.hpp>
 #include <cmath>
 
 // Generic point cloud class for storing 3D point data (int32_t coordinates)
+// Assumes size_t fits in uint32_t for WASM 32 target
 class PointCloud {
 private:
     std::vector<int32_t> data;  // Stores x, y, z coordinates sequentially
@@ -41,10 +43,10 @@ public:
     size_t get_num_points() const {
         return data.size() / 3;
     }
-    
-    // Get total size (num_points * 3)
-    size_t get_size() const {
-        return data.size();
+
+    // Get number of points
+    size_t get_num_edges() const {
+        return edges.size();
     }
     
     // Get element at index (linear access to x, y, z values)
@@ -70,9 +72,6 @@ public:
             return 0;
         }
         size_t index = point_index * 3 + coord;
-        if (index >= data.size()) {
-            return 0;
-        }
         return data[index];
     }
     
@@ -110,6 +109,70 @@ public:
 
     std::vector<std::pair<uint32_t, uint32_t>>& get_edges() {
         return edges;
+    }
+
+    // Map every node to the index of the maximum node that is accessible from it by some edge
+    std::vector<uint32_t> get_component_ids() {
+        auto nr_points = this->get_num_points();
+
+        // Initialize
+        std::vector<uint32_t> component_ids(nr_points);
+        for (size_t i = 0; i < nr_points; i++) {
+            component_ids[i] = static_cast<uint32_t>(i);
+        }
+
+        bool any_change = true;
+        while (any_change) {
+            any_change = false;
+            for (const auto& edge: this->get_edges()) {
+                if (component_ids[edge.first] != component_ids[edge.second]) {
+                    component_ids[edge.first] = std::max<uint32_t>(
+                        component_ids[edge.first],
+                        component_ids[edge.second]
+                    );
+                    component_ids[edge.second] = std::max<uint32_t>(
+                        component_ids[edge.first],
+                        component_ids[edge.second]
+                    );
+                    any_change = true;
+                }
+            }
+        }
+
+        return component_ids;
+    }
+
+    bool is_fully_connected() {
+        const auto nr_edges = this->get_num_edges();
+        const auto nr_points = this->get_num_points();
+
+        if (nr_points == 0)
+            return true;
+
+        if (nr_edges < nr_points - 1)
+            return false; // early return
+
+        std::vector<bool> covered_points(nr_points, false);
+        std::vector<bool> covered_edges(nr_edges, false);
+        covered_points[0] = true;
+        bool any_change = true;
+        while (any_change) {
+            any_change = false;
+            for (size_t i = 0; i < nr_edges; i++) {
+                if (covered_edges[i])
+                    continue;
+
+                const auto edge = this->edges[i];
+                if (covered_points[edge.first] ^ covered_points[edge.second]) {
+                    covered_points[edge.first] = true;
+                    covered_points[edge.second] = true;
+                    covered_edges[i] = true;
+                    any_change = true;
+                }
+            }
+        }
+
+        return std::all_of(covered_points.begin(), covered_points.end(), [](bool x) {return x;});
     }
 
     const int32_t* get_data_ptr() const {

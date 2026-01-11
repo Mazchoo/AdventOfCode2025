@@ -93,14 +93,13 @@ namespace day08
         return new PointCloud(std::move(data));
     }
 
-    // Assumes size_t fits in uint32_t
     uint32_t connect_closest_points(PointCloud* point_cloud, uint32_t nr_connections) {
         size_t nr_points = point_cloud->get_num_points();
         if (nr_points < 3)
             return 0; // Need to count the top three so doesn't make any sense if this is true
 
         KDTree index(
-            3, *point_cloud, nanoflann::KDTreeSingleIndexAdaptorParams(10)
+            3, *point_cloud, nanoflann::KDTreeSingleIndexAdaptorParams(nr_points)
         );
         index.buildIndex();
 
@@ -147,27 +146,7 @@ namespace day08
             }
         }
 
-        std::vector<uint32_t> component_ids(nr_points);
-        for (size_t i = 0; i < nr_points; i++) {
-            component_ids[i] = static_cast<uint32_t>(i);
-        }
-        bool any_change = true;
-        while (any_change) {
-            any_change = false;
-            for (const auto& edge: point_cloud->get_edges()) {
-                if (component_ids[edge.first] != component_ids[edge.second]) {
-                    component_ids[edge.first] = std::max<uint32_t>(
-                        component_ids[edge.first],
-                        component_ids[edge.second]
-                    );
-                    component_ids[edge.second] = std::max<uint32_t>(
-                        component_ids[edge.first],
-                        component_ids[edge.second]
-                    );
-                    any_change = true;
-                }
-            }
-        }
+        auto component_ids = point_cloud->get_component_ids();
 
         std::vector<uint32_t> id_counts(nr_points, 0);
         for (size_t i = 0; i < nr_points; i++) {
@@ -177,6 +156,64 @@ namespace day08
         uint32_t result = 1;
         for (size_t i = 0; i < 3; i++) {
             result *= id_counts[i];
+        }
+
+        return result;
+    }
+
+    uint64_t connect_until_saturated(PointCloud* point_cloud) {
+        size_t nr_points = point_cloud->get_num_points();
+        if (nr_points < 3)
+            return 0; // Need to count the top three so doesn't make any sense if this is true
+
+        KDTree index(
+            3, *point_cloud, nanoflann::KDTreeSingleIndexAdaptorParams(nr_points)
+        );
+        index.buildIndex();
+
+        std::vector<size_t> idx(nr_points);
+        std::vector<double> dists(nr_points);
+        nanoflann::KNNResultSet<double> rs(nr_points);
+
+        std::vector<EdgeInfo> neighbour_distances = {};
+        neighbour_distances.reserve(nr_points * (nr_points - 1) / 2);
+
+        const int32_t* point_data = point_cloud->get_data_ptr();
+        double query_pt[3] = {0.0, 0.0, 0.0};
+
+        for (size_t i = 0; i < nr_points - 1; i++) {
+            rs.init(idx.data(), dists.data());
+            query_pt[0] = static_cast<double>(point_data[i * 3]);
+            query_pt[1] = static_cast<double>(point_data[i * 3 + 1]);
+            query_pt[2] = static_cast<double>(point_data[i * 3 + 2]);
+
+            index.findNeighbors(rs, query_pt);
+            for (size_t j = 1; j < nr_points; j++) {
+                neighbour_distances.emplace_back(EdgeInfo{{
+                    static_cast<uint32_t>(i),
+                    static_cast<uint32_t>(idx[j])},
+                dists[j]});
+            }
+        }
+
+        std::sort(neighbour_distances.begin(),
+            neighbour_distances.end(),
+            [](const auto& a, const auto& b) {
+                return a.distance < b.distance;
+            });
+
+        uint64_t result = 0;
+        for (size_t i = 0; i < neighbour_distances.size(); i++) {
+            auto edge_info = neighbour_distances[i];
+            if (!point_cloud->has_edge(edge_info.edge.first, edge_info.edge.second)) {
+                point_cloud->add_edge(edge_info.edge.first, edge_info.edge.second);
+                if (point_cloud->is_fully_connected()) {
+                    auto first_x = static_cast<uint64_t>(point_cloud->get_point(edge_info.edge.first, 0));
+                    auto second_x = static_cast<uint64_t>(point_cloud->get_point(edge_info.edge.second, 0));
+                    result = first_x * second_x;
+                    break;
+                }
+            }
         }
 
         return result;

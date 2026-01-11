@@ -11,7 +11,7 @@ class PointCloud(WasmPtr):
     """Wrapper around 3D point cloud (int32) on the wasm side"""
 
     call_names = (
-        "get_point_cloud_size",
+        "get_point_cloud_num_points",
         "get_point_cloud_element",
         "set_point_cloud_element",
         "get_point_cloud_point",
@@ -38,17 +38,11 @@ class PointCloud(WasmPtr):
             "free_point_cloud",
             num_points,
         )
-        self._num_points = num_points
 
     @property
     def num_points(self) -> int:
         """Get the number of points in the cloud"""
-        return self._num_points
-
-    @property
-    def size(self) -> int:
-        """Get the total size of the point cloud (num_points * 3)"""
-        return self("get_point_cloud_size")
+        return self("get_point_cloud_num_points")
 
     def get_element(self, index: int) -> int:
         """
@@ -129,7 +123,7 @@ class PointCloud(WasmPtr):
         buffer_start = ctypes.addressof(memory_data.contents) + data_ptr
         buffer = (ctypes.c_int32 * size).from_address(buffer_start)
 
-        arr = np.frombuffer(buffer, dtype=np.int32).reshape(self._num_points, 3)
+        arr = np.frombuffer(buffer, dtype=np.int32).reshape(self.num_points, 3)
 
         return arr.copy()  # Return a copy to avoid memory issues
 
@@ -169,7 +163,7 @@ class PointCloud(WasmPtr):
 
     def __len__(self) -> int:
         """Return the number of points in the cloud"""
-        return self._num_points
+        return self.num_points
 
     def __setitem__(self, key, value):
         """
@@ -188,13 +182,13 @@ class PointCloud(WasmPtr):
             success = self.set_point(key, x, y, z)
             if success == 0:
                 raise IndexError(
-                    f"Point cloud index {key} out of range for {self._num_points} points"
+                    f"Point cloud index {key} out of range for {self.num_points} points"
                 )
         else:
             success = self.set_element(key, value)
             if success == 0:
                 raise IndexError(
-                    f"Point cloud element index {key} out of range for size {self.size}"
+                    f"Point cloud element index {key} out of range for size {self.num_points}"
                 )
 
     def __getitem__(self, key):
@@ -207,8 +201,8 @@ class PointCloud(WasmPtr):
         Returns:
             Tuple of (x, y, z) coordinates for the point
         """
-        if key < 0 or key >= self._num_points:
+        if key < 0 or key >= self.num_points:
             raise IndexError(
-                f"Point cloud index {key} out of range for {self._num_points} points"
+                f"Point cloud index {key} out of range for {self.num_points} points"
             )
         return self.get_point(key)

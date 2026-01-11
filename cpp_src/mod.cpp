@@ -27,6 +27,13 @@ extern "C" {
         return day08::connect_closest_points(pc, nr_connections);
     }
 
+    // Day08 specific - Connects points until fully connected
+    EXPORT_FUNC
+    uint64_t connect_until_saturated(void* cloud) {
+        auto pc = static_cast<PointCloud*>(cloud);
+        return day08::connect_until_saturated(pc);
+    }
+
     // Day08 specific - Creates point cloud from day08 payload
     EXPORT_FUNC
     void* create_point_cloud_day8(const char* payload_ptr, int payload_len) {
@@ -380,13 +387,6 @@ extern "C" {
     int get_point_cloud_num_points(void* cloud) {
         auto pc = static_cast<PointCloud*>(cloud);
         return static_cast<int>(pc->get_num_points());
-    }
-    
-    // Gets the total size of a point cloud (num_points * 3)
-    EXPORT_FUNC
-    int get_point_cloud_size(void* cloud) {
-        auto pc = static_cast<PointCloud*>(cloud);
-        return static_cast<int>(pc->get_size());
     }
     
     // Gets a value at specified index in point cloud

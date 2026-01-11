@@ -1,4 +1,4 @@
-"""Day 05"""
+"""Day 06"""
 
 import pytest
 

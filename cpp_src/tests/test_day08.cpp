@@ -6,6 +6,36 @@ using namespace day08;
 
 // Test suite for parse_coordinates function
 TEST_SUITE("Day08 Tests") {
+    TEST_CASE("test saturated return on sample input") {
+        std::string_view input = R"("162,817,812
+            57, 618, 57
+            906, 360, 560
+            592, 479, 940
+            352, 342, 300
+            466, 668, 158
+            542, 29, 236
+            431, 825, 988
+            739, 650, 466
+            52, 470, 668
+            216, 146, 977
+            819, 987, 18
+            117, 168, 530
+            805, 96, 715
+            346, 949, 466
+            970, 615, 88
+            941, 993, 340
+            862, 61, 35
+            984, 92, 344
+            425, 690, 689)";
+        PointCloud* cloud = parse_coordinates(input);
+
+        REQUIRE(cloud != nullptr);
+        auto result = connect_until_saturated(cloud);
+        CHECK(result == 25272);
+
+        free_point_cloud(cloud);
+    }
+
     TEST_CASE("test number of components sample input") {
         std::string_view input = R"("162,817,812
             57, 618, 57
@@ -42,7 +72,6 @@ TEST_SUITE("Day08 Tests") {
         
         REQUIRE(cloud != nullptr);
         REQUIRE(cloud->get_num_points() == 1);
-        REQUIRE(cloud->get_size() == 3);
         
         CHECK(cloud->get_point(0, 0) == 162);  // x
         CHECK(cloud->get_point(0, 1) == 817);  // y
@@ -57,7 +86,6 @@ TEST_SUITE("Day08 Tests") {
         
         REQUIRE(cloud != nullptr);
         REQUIRE(cloud->get_num_points() == 3);
-        REQUIRE(cloud->get_size() == 9);
         
         // First coordinate
         CHECK(cloud->get_point(0, 0) == 162);
@@ -196,7 +224,6 @@ TEST_SUITE("Day08 Tests") {
         
         REQUIRE(cloud != nullptr);
         CHECK(cloud->get_num_points() == 0);
-        CHECK(cloud->get_size() == 0);
         
         free_point_cloud(cloud);
     }
@@ -207,7 +234,6 @@ TEST_SUITE("Day08 Tests") {
         
         REQUIRE(cloud != nullptr);
         CHECK(cloud->get_num_points() == 0);
-        CHECK(cloud->get_size() == 0);
         
         free_point_cloud(cloud);
     }

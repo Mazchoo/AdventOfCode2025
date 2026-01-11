@@ -8,7 +8,7 @@ from python_src.common.call_advent_function import call_wasm_with_string
 class JunctionBoxes(PointCloud):
     """Day08-specific point cloud wrapper with junction boxes functionality"""
 
-    call_names = ("connect_closest_points",)
+    call_names = ("connect_closest_points", "connect_until_saturated")
 
     def __init__(self, store: Store, instance: Instance, num_points: int):
         """
@@ -56,14 +56,19 @@ class JunctionBoxes(PointCloud):
 
         pc.free_func = instance.exports(store)["free_point_cloud"]
 
-        # Get number of points from the created point cloud
-        pc._num_points = pc("get_point_cloud_size")
-
         return pc
 
     def connect_closest_points(self, nr_connections: int) -> int:
         """
-            Connect closest points in the point cloud
-            Adds edges to point cloud in place
+        Connect closest points in the point cloud
+        Adds edges to point cloud in place
         """
         return self("connect_closest_points", nr_connections)
+
+    def connect_until_saturated(self) -> int:
+        """
+        Connect points until the point cloud is fully connected
+        Adds edges to point cloud in place
+        Returns the product of x-coordinates of the final edge
+        """
+        return self("connect_until_saturated")
