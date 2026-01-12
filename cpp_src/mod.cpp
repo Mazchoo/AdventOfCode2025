@@ -18,8 +18,16 @@
 #include "src/day06.hpp"
 #include "src/day07.hpp"
 #include "src/day08.hpp"
+#include "src/day09.hpp"
 
 extern "C" {
+    // Day08 specific - Connects closest points in point cloud
+    EXPORT_FUNC
+    uint64_t get_largest_rect(const char* payload_ptr, int payload_len) {
+        std::string_view payload(payload_ptr, payload_len);
+        return day09::largest_rectangle_area(payload);
+    }
+
     // Day08 specific - Connects closest points in point cloud
     EXPORT_FUNC
     uint32_t connect_closest_points(void* cloud, uint32_t nr_connections) {
