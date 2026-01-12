@@ -10,6 +10,17 @@ namespace day09
     using Coordinate = std::pair<int32_t, int32_t>;
     using Rect = std::pair<Coordinate, Coordinate>;
 
+    // Construct a Rect from two coordinates in any order
+    // Normalizes them to {{min_x, min_y}, {max_x, max_y}} format
+    inline Rect make_rect(const Coordinate& c1, const Coordinate& c2) {
+        int32_t min_x = std::min(c1.first, c2.first);
+        int32_t max_x = std::max(c1.first, c2.first);
+        int32_t min_y = std::min(c1.second, c2.second);
+        int32_t max_y = std::max(c1.second, c2.second);
+        
+        return {{min_x, min_y}, {max_x, max_y}};
+    }
+
     // Returns true if three coordinates form a clockwise triangle, false if counter-clockwise
     // Uses the cross product of vectors (p2-p1) and (p3-p1)
     // If cross product > 0: counter-clockwise, < 0: clockwise, = 0: collinear
@@ -48,6 +59,29 @@ namespace day09
         }
         
         return {{min_x, min_y}, {max_x, max_y}};
+    }
+
+    // Check if two rectangles properly intersect (not just touch)
+    // Rect format: {{min_x, min_y}, {max_x, max_y}}
+    // Returns true if the rectangles have overlapping interior area
+    inline bool rects_intersect(const Rect& r1, const Rect& r2) {
+        // Extract coordinates
+        int32_t r1_min_x = r1.first.first;
+        int32_t r1_min_y = r1.first.second;
+        int32_t r1_max_x = r1.second.first;
+        int32_t r1_max_y = r1.second.second;
+        
+        int32_t r2_min_x = r2.first.first;
+        int32_t r2_min_y = r2.first.second;
+        int32_t r2_max_x = r2.second.first;
+        int32_t r2_max_y = r2.second.second;
+        
+        // For proper intersection (not just touching), we need strict inequality
+        // Rectangles intersect if they overlap in both x and y dimensions
+        bool x_overlap = r1_min_x < r2_max_x && r1_max_x > r2_min_x;
+        bool y_overlap = r1_min_y < r2_max_y && r1_max_y > r2_min_y;
+        
+        return x_overlap && y_overlap;
     }
 
     // Find the bounding rectangle from three coordinates
@@ -120,6 +154,46 @@ namespace day09
         uint64_t result = 0;
         for (size_t i = 0; i < coordinates.size(); i++) {
             for (size_t j = i + 1; j < coordinates.size(); j++) {
+                uint64_t dx = static_cast<uint64_t>(std::abs(coordinates[i].first - coordinates[j].first)) + 1;
+                uint64_t dy = static_cast<uint64_t>(std::abs(coordinates[i].second - coordinates[j].second)) + 1;
+                result = std::max<uint64_t>(result, dx * dy);
+            }
+        }
+
+        return result;
+    }
+
+        // Find the largest rectangle from a pair of coordinates
+    uint64_t largest_rectangle_within_contour(std::string_view payload) {
+        auto coordinates = parse_coordinates(payload);
+        auto nr_coordinates = coordinates.size();
+
+        std::vector<Rect> exclusion_rects = {};
+        for (size_t i = 0; i < nr_coordinates; i++) {
+            auto p1 = coordinates[i];
+            auto p2 = coordinates[(i + 1) % nr_coordinates];
+            auto p3 = coordinates[(i + 2) % nr_coordinates];
+
+            if (is_clockwise(p1, p2, p3))
+                exclusion_rects.emplace_back(bounded_rect(p1, p2, p3));
+        }
+
+
+        uint64_t result = 0;
+        for (size_t i = 0; i < coordinates.size(); i++) {
+            for (size_t j = i + 1; j < coordinates.size(); j++) {
+                auto new_rect = make_rect(coordinates[i], coordinates[j]);
+                bool is_valid = true;
+                for (auto& exlcusion_rect : exclusion_rects) {
+                    if (rects_intersect(new_rect, exlcusion_rect)) {
+                        is_valid = false;
+                        break;
+                    }
+                }
+
+                if (!is_valid)
+                    break;
+
                 uint64_t dx = static_cast<uint64_t>(std::abs(coordinates[i].first - coordinates[j].first)) + 1;
                 uint64_t dy = static_cast<uint64_t>(std::abs(coordinates[i].second - coordinates[j].second)) + 1;
                 result = std::max<uint64_t>(result, dx * dy);

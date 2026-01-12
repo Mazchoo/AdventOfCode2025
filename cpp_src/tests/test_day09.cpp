@@ -5,6 +5,14 @@ using namespace day09;
 
 // Test suite for parse_coordinates function
 TEST_SUITE("Day09 Tests") {
+    TEST_CASE("parse_coordinates - sample input") {
+        std::string_view input = "7,1\n11,1\n11,7\n9,7\n9,5\n2,5\n2,3\n7,3";
+        auto result = largest_rectangle_within_contour(input);
+
+        REQUIRE(result == 24);
+
+    }
+
     TEST_CASE("parse_coordinates - single coordinate") {
         std::string_view input = "7,1";
         auto coords = parse_coordinates(input);
@@ -161,5 +169,38 @@ TEST_SUITE("Day09 Tests") {
         CHECK(rect.first.second == -2);   // min_y
         CHECK(rect.second.first == 1);   // max_x
         CHECK(rect.second.second == -1);  // max_y
+    }
+    
+    TEST_CASE("rects_intersect - overlapping rectangles") {
+        // Rectangle 1: (0,0) to (10,10)
+        Rect r1 = {{0, 0}, {10, 10}};
+        
+        // Rectangle 2: (5,5) to (15,15) - overlaps with r1
+        Rect r2 = {{5, 5}, {15, 15}};
+        
+        CHECK(rects_intersect(r1, r2) == true);
+        CHECK(rects_intersect(r2, r1) == true);  // Should be symmetric
+    }
+    
+    TEST_CASE("rects_intersect - non-overlapping rectangles") {
+        // Rectangle 1: (0,0) to (5,5)
+        Rect r1 = {{0, 0}, {5, 5}};
+        
+        // Rectangle 2: (10,10) to (15,15) - does not overlap with r1
+        Rect r2 = {{10, 10}, {15, 15}};
+        
+        CHECK(rects_intersect(r1, r2) == false);
+        CHECK(rects_intersect(r2, r1) == false);  // Should be symmetric
+    }
+
+    TEST_CASE("rects_intersect - touching returns false") {
+        // Rectangle 1: (0,0) to (5,5)
+        Rect r1 = { {0, 0}, {5, 5} };
+
+        // Rectangle 2: (10,10) to (15,15) - does not overlap with r1
+        Rect r2 = { {6, 0}, {10, 5} };
+
+        CHECK(rects_intersect(r1, r2) == false);
+        CHECK(rects_intersect(r2, r1) == false);  // Should be symmetric
     }
 }
