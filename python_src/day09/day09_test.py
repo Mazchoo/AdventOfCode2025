@@ -8,6 +8,7 @@ from python_src.common.call_advent_function import get_payload_result
 STORE, INSTANCE = load_wasm_module("./emcc_wasm/build/mod.wasm")
 
 get_largest_rect = INSTANCE.exports(STORE)["get_largest_rect"]
+get_largest_rect_within_contour = INSTANCE.exports(STORE)["get_largest_rect_within_contour"]
 
 
 def test_day09_pt1_sample():
@@ -24,6 +25,22 @@ def test_day09_pt1():
     path = "./python_src/day09/input/full.txt"
     result = get_payload_result(path, STORE, INSTANCE, get_largest_rect)
     assert result == 4745816424
+
+
+def test_day09_pt2_sample():
+    """Test get_payload_result(char*, int) -> uint64_t"""
+
+    path = "./python_src/day09/input/sample.txt"
+    result = get_payload_result(path, STORE, INSTANCE, get_largest_rect_within_contour)
+    assert result == 24
+
+
+def test_day09_pt2():
+    """Test get_payload_result(char*, int) -> uint64_t"""
+
+    path = "./python_src/day09/input/full.txt"
+    result = get_payload_result(path, STORE, INSTANCE, get_largest_rect_within_contour)
+    assert result == 1351617690
 
 
 if __name__ == "__main__":

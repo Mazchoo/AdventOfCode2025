@@ -192,7 +192,7 @@ namespace day09
                 }
 
                 if (!is_valid)
-                    break;
+                    continue;
 
                 uint64_t dx = static_cast<uint64_t>(std::abs(coordinates[i].first - coordinates[j].first)) + 1;
                 uint64_t dy = static_cast<uint64_t>(std::abs(coordinates[i].second - coordinates[j].second)) + 1;

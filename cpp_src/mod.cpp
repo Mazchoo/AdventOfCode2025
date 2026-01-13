@@ -21,7 +21,14 @@
 #include "src/day09.hpp"
 
 extern "C" {
-    // Day08 specific - Connects closest points in point cloud
+    // Day09 pt 2
+    EXPORT_FUNC
+    uint64_t get_largest_rect_within_contour(const char* payload_ptr, int payload_len) {
+        std::string_view payload(payload_ptr, payload_len);
+        return day09::largest_rectangle_within_contour(payload);
+    }
+
+    // Day09 pt 1
     EXPORT_FUNC
     uint64_t get_largest_rect(const char* payload_ptr, int payload_len) {
         std::string_view payload(payload_ptr, payload_len);
