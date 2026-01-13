@@ -8,7 +8,9 @@ from python_src.common.call_advent_function import get_payload_result
 STORE, INSTANCE = load_wasm_module("./emcc_wasm/build/mod.wasm")
 
 get_largest_rect = INSTANCE.exports(STORE)["get_largest_rect"]
-get_largest_rect_within_contour = INSTANCE.exports(STORE)["get_largest_rect_within_contour"]
+get_largest_rect_within_contour = INSTANCE.exports(STORE)[
+    "get_largest_rect_within_contour"
+]
 
 
 def test_day09_pt1_sample():
