@@ -19,8 +19,16 @@
 #include "src/day07.hpp"
 #include "src/day08.hpp"
 #include "src/day09.hpp"
+#include "src/day10.hpp"
 
 extern "C" {
+    // Day10 pt 1
+    EXPORT_FUNC
+    uint32_t fewest_button_presses(const char* payload_ptr, int payload_len) {
+        std::string_view payload(payload_ptr, payload_len);
+        return day10::fewest_button_presses(payload);
+    }
+
     // Day09 pt 2
     EXPORT_FUNC
     uint64_t get_largest_rect_within_contour(const char* payload_ptr, int payload_len) {
