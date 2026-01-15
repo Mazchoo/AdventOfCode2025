@@ -22,6 +22,13 @@
 #include "src/day10.hpp"
 
 extern "C" {
+    // Day10 pt 2
+    EXPORT_FUNC
+    uint32_t fewest_presses_to_configuration(const char* payload_ptr, int payload_len) {
+        std::string_view payload(payload_ptr, payload_len);
+        return day10::fewest_presses_to_configuration(payload);
+    }
+
     // Day10 pt 1
     EXPORT_FUNC
     uint32_t fewest_button_presses(const char* payload_ptr, int payload_len) {
