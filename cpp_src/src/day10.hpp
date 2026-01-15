@@ -6,6 +6,9 @@
 #include <string_view>
 #include <cstdint>
 #include <cmath>
+#include <queue>
+#include <algorithm>
+#include <iostream>
 
 namespace day10
 {
@@ -29,7 +32,7 @@ namespace day10
     // where the numbers indicate which bit positions are set to true
     // e.g., (3) = [False, False, False, True] = bit 3 set = 0b1000
     // e.g., (1,3) = bits 1 and 3 set = 0b1010
-    BooleanState parse_line_boolean(std::string_view line) {
+    inline BooleanState parse_line_boolean(std::string_view line) {
         BooleanState state;
         state.initial_state = 0;
         state.nr_digits = 0;
@@ -133,7 +136,7 @@ namespace day10
     // e.g., (3) with 4 digits = [0, 0, 0, 1] (4th position is 1)
     // e.g., (1,3) with 4 digits = [0, 1, 0, 1] (2nd and 4th positions are 1)
     // {3,5,4,7} is parsed as a vector of uint8_t values
-    IntegerState parse_line_integer(std::string_view line) {
+    inline IntegerState parse_line_integer(std::string_view line) {
         IntegerState state;
         state.nr_digits = 0;
         
@@ -259,7 +262,7 @@ namespace day10
     }
 
     // Parse multiple lines of input and return a vector of State objects
-    std::vector<BooleanState> parse_input_boolean(std::string_view payload) {
+    inline std::vector<BooleanState> parse_input_boolean(std::string_view payload) {
         std::vector<BooleanState> states;
         
         size_t line_start = 0;
@@ -292,7 +295,7 @@ namespace day10
     }
 
     // Parse multiple lines of input and return a vector of IntegerState objects
-    std::vector<IntegerState> parse_input_integer(std::string_view payload) {
+    inline std::vector<IntegerState> parse_input_integer(std::string_view payload) {
         std::vector<IntegerState> states;
         
         size_t line_start = 0;
@@ -324,7 +327,7 @@ namespace day10
         return states;
     }
 
-    uint32_t fewest_button_presses(std::string_view payload) {
+    inline uint32_t fewest_button_presses(std::string_view payload) {
         std::vector<BooleanState> states = parse_input_boolean(payload);
         uint32_t result = 0;
 
@@ -367,61 +370,87 @@ namespace day10
         return result;
     }
 
-    uint32_t fewest_presses_to_configuration(std::string_view payload) {
+    inline uint32_t fewest_presses_to_configuration(std::string_view payload) {
         std::vector<IntegerState> states = parse_input_integer(payload);
         uint32_t result = 0;
 
         for (auto& state : states) {
             auto target_state = state.final_values;
-            std::map<std::vector<uint8_t>, bool> solution;
+            std::map<std::vector<uint8_t>, uint32_t> solution;
 
             std::vector<uint8_t> initial_state(state.nr_digits, 0);
             if (initial_state == target_state)
                 continue;
-            solution[initial_state] = true;
 
-            std::vector<std::vector<uint8_t>> candidates = { initial_state };
-            std::vector<std::vector<uint8_t>> new_candidates = {};
+            // Calculate target sum
+            uint32_t target_sum = 0;
+            for (auto val : target_state)
+                target_sum += val;
+
+            // Priority queue: pair of (priority, state)
+            // Priority is the absolute difference from target sum (lower is better)
+            // We use negative priority for max heap behavior (to get min priority)
+            auto compare = [](const std::pair<uint32_t, std::vector<uint8_t>>& a,
+                            const std::pair<uint32_t, std::vector<uint8_t>>& b) {
+                return a.first > b.first; // Min heap based on priority
+            };
+            std::priority_queue<std::pair<uint32_t, std::vector<uint8_t>>,
+                              std::vector<std::pair<uint32_t, std::vector<uint8_t>>>,
+                              decltype(compare)> candidates(compare);
+
+            candidates.push({0, initial_state});
+            solution[initial_state] = 0;
 
             bool solution_found = false;
-            uint32_t current_iteration = 0;
-            while (!solution_found) {
-                current_iteration++;
-                for (auto& candidate : candidates) {
-                    for (auto& transition : state.transitions) {
-                        std::vector<uint8_t> new_state = candidate;
-                        for (int i = 0; i < state.nr_digits; i++)
-                            new_state[i] += transition[i];
+            uint32_t min_presses = 0;
 
-                        if (new_state == target_state) {
-                            solution_found = true;
-                            break;
-                        }
+            while (!solution_found && !candidates.empty()) {
+                auto [priority, candidate] = candidates.top();
+                candidates.pop();
 
-                        auto it = solution.find(new_state);
-                        if (it == solution.end()) {
-                            solution[new_state] = true;
-                        } else {
-                            continue;
-                        }
+                uint32_t current_presses = solution[candidate];
 
-                        bool overflow_constraint = false;
-                        for (int i = 0; i < state.nr_digits; i++) {
-                            if (new_state[i] > target_state[i]) {
-                                overflow_constraint = true;
-                                break;
-                            }
-                        }
-                        if (!overflow_constraint)
-                            new_candidates.push_back(new_state);
+                for (auto& transition : state.transitions) {
+                    std::vector<uint8_t> new_state = candidate;
+
+                    // Check overflow constraint
+                    uint8_t slack_constraint = 255;
+                    for (int i = 0; i < state.nr_digits; i++) {
+                        slack_constraint = std::min<uint8_t>(slack_constraint, target_state[i] - new_state[i]);
                     }
-                    if (solution_found)
+
+                    for (int i = 0; i < state.nr_digits; i++)
+                        new_state[i] += transition[i] * slack_constraint;
+
+                    if (new_state == target_state) {
+                        solution_found = true;
+                        min_presses = current_presses + slack_constraint;
                         break;
+                    }
+
+                    if (slack_constraint == 0)
+                        continue; // stuck
+
+                    // Check if we've seen this state before
+                    auto it = solution.find(new_state);
+                    if (it != solution.end())
+                        continue;
+
+                    // Calculate sum and priority
+                    uint32_t new_sum = 0;
+                    for (auto val : new_state)
+                        new_sum += val;
+                    
+                    uint32_t new_priority = current_presses + slack_constraint;
+
+                    solution[new_state] = new_priority;
+                    candidates.push({new_priority, new_state});
                 }
-                candidates = new_candidates;
-                new_candidates.clear();
+                
+                if (solution_found)
+                    break;
             }
-            result += current_iteration;
+            result += min_presses;
         }
 
         return result;
