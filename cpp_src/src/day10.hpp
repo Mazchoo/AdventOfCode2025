@@ -390,21 +390,21 @@ namespace day10
             // Priority queue: pair of (priority, state)
             // Priority is the absolute difference from target sum (lower is better)
             // We use negative priority for max heap behavior (to get min priority)
-            auto compare = [](const std::pair<uint32_t, std::vector<uint8_t>>& a,
-                            const std::pair<uint32_t, std::vector<uint8_t>>& b) {
+            auto compare = [](const std::pair<float, std::vector<uint8_t>>& a,
+                            const std::pair<float, std::vector<uint8_t>>& b) {
                 return a.first > b.first; // Min heap based on priority
             };
-            std::priority_queue<std::pair<uint32_t, std::vector<uint8_t>>,
-                              std::vector<std::pair<uint32_t, std::vector<uint8_t>>>,
+            std::priority_queue<std::pair<float, std::vector<uint8_t>>,
+                              std::vector<std::pair<float, std::vector<uint8_t>>>,
                               decltype(compare)> candidates(compare);
 
             candidates.push({0, initial_state});
             solution[initial_state] = 0;
 
             bool solution_found = false;
-            uint32_t min_presses = 0;
+            uint32_t min_presses = 1000000;
 
-            while (!solution_found && !candidates.empty()) {
+            while (!candidates.empty()) {
                 auto [priority, candidate] = candidates.top();
                 candidates.pop();
 
@@ -416,7 +416,8 @@ namespace day10
                     // Check overflow constraint
                     uint8_t slack_constraint = 255;
                     for (int i = 0; i < state.nr_digits; i++) {
-                        slack_constraint = std::min<uint8_t>(slack_constraint, target_state[i] - new_state[i]);
+                        if (transition[i] > 0)
+                            slack_constraint = std::min<uint8_t>(slack_constraint, target_state[i] - new_state[i]);
                     }
 
                     for (int i = 0; i < state.nr_digits; i++)
@@ -424,8 +425,8 @@ namespace day10
 
                     if (new_state == target_state) {
                         solution_found = true;
-                        min_presses = current_presses + slack_constraint;
-                        break;
+                        min_presses = std::min<uint32_t>(min_presses, current_presses + slack_constraint);
+                        continue;
                     }
 
                     if (slack_constraint == 0)
@@ -441,16 +442,18 @@ namespace day10
                     for (auto val : new_state)
                         new_sum += val;
                     
-                    uint32_t new_priority = current_presses + slack_constraint;
+                    float new_priority = static_cast<float>(new_sum) / static_cast<float>(current_presses + slack_constraint);
 
-                    solution[new_state] = new_priority;
+                    solution[new_state] = current_presses + slack_constraint;
                     candidates.push({new_priority, new_state});
                 }
-                
-                if (solution_found)
-                    break;
             }
-            result += min_presses;
+            if (solution_found) {
+                result += min_presses;
+            } else {
+                std::cout << "Oh no";
+            }
+
         }
 
         return result;
