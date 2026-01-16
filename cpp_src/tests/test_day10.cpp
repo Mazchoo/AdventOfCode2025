@@ -547,4 +547,274 @@ TEST_SUITE("Day10 Tests") {
         REQUIRE(states.size() == 1);
         CHECK(states[0].nr_digits == 4);
     }
+    
+    TEST_CASE("solve_simplex - simple 2D problem") {
+        // Minimize: x1 + x2
+        // Subject to: x1 + 0*x2 = 3
+        //            0*x1 + x2 = 5
+        //            x1, x2 >= 0
+        // Expected solution: x1 = 3, x2 = 5, objective = 8
+        IntegerState state;
+        state.nr_digits = 2;
+        state.transitions = {
+            {1.0f, 0.0f},  // x1 affects only first digit
+            {0.0f, 1.0f}   // x2 affects only second digit
+        };
+        state.final_values = {3.0f, 5.0f};
+        
+        auto solution = solve_simplex(state);
+        
+        REQUIRE(solution.size() == 2);
+        CHECK(std::abs(solution[0] - 3.0f) < 0.01f);
+        CHECK(std::abs(solution[1] - 5.0f) < 0.01f);
+    }
+    
+    TEST_CASE("solve_simplex - overdetermined system with unique solution") {
+        // Minimize: x1 + x2 + x3
+        // Subject to: 2*x1 + x2 + 0*x3 = 10
+        //            x1 + 0*x2 + x3 = 7
+        //            0*x1 + x2 + x3 = 8
+        //            x1, x2, x3 >= 0
+        // This system has constraints that determine a unique solution
+        IntegerState state;
+        state.nr_digits = 3;
+        state.transitions = {
+            {2.0f, 1.0f, 0.0f},  // x1
+            {1.0f, 0.0f, 1.0f},  // x2
+            {0.0f, 1.0f, 1.0f}   // x3
+        };
+        state.final_values = {10.0f, 7.0f, 8.0f};
+        
+        auto solution = solve_simplex(state);
+        
+        REQUIRE(solution.size() == 3);
+        
+        // Verify the solution satisfies all constraints
+        float constraint1 = 2.0f * solution[0] + 1.0f * solution[1] + 0.0f * solution[2];
+        float constraint2 = 1.0f * solution[0] + 0.0f * solution[1] + 1.0f * solution[2];
+        float constraint3 = 0.0f * solution[0] + 1.0f * solution[1] + 1.0f * solution[2];
+        
+        CHECK(std::abs(constraint1 - 10.0f) < 0.01f);
+        CHECK(std::abs(constraint2 - 7.0f) < 0.01f);
+        CHECK(std::abs(constraint3 - 8.0f) < 0.01f);
+        
+        // All solutions should be non-negative
+        CHECK(solution[0] >= -0.01f);
+        CHECK(solution[1] >= -0.01f);
+        CHECK(solution[2] >= -0.01f);
+    }
+    
+    TEST_CASE("solve_simplex - multiple variables contributing to same constraint") {
+        // Minimize: x1 + x2 + x3
+        // Subject to: x1 + x2 + x3 = 10
+        //            2*x1 + x2 + 0*x3 = 12
+        //            x1, x2, x3 >= 0
+        // Multiple valid solutions exist; simplex should find one
+        IntegerState state;
+        state.nr_digits = 2;
+        state.transitions = {
+            {1.0f, 2.0f},  // x1
+            {1.0f, 1.0f},  // x2
+            {1.0f, 0.0f}   // x3
+        };
+        state.final_values = {10.0f, 12.0f};
+        
+        auto solution = solve_simplex(state);
+        
+        REQUIRE(solution.size() == 3);
+        
+        // Verify constraints are satisfied
+        float constraint1 = solution[0] + solution[1] + solution[2];
+        float constraint2 = 2.0f * solution[0] + solution[1];
+        
+        CHECK(std::abs(constraint1 - 10.0f) < 0.01f);
+        CHECK(std::abs(constraint2 - 12.0f) < 0.01f);
+        
+        // All solutions should be non-negative
+        CHECK(solution[0] >= -0.01f);
+        CHECK(solution[1] >= -0.01f);
+        CHECK(solution[2] >= -0.01f);
+    }
+    
+    TEST_CASE("solve_simplex - problem from sample input line 1") {
+        // Parse the first line from the sample input
+        std::string_view input = "[.##.] (3) (1,3) (2) (2,3) (0,2) (0,1) {3,5,4,7}";
+        auto state = parse_line_integer(input);
+        
+        REQUIRE(state.nr_digits == 4);
+        REQUIRE(state.transitions.size() == 6);
+        REQUIRE(state.final_values.size() == 4);
+        
+        auto solution = solve_simplex(state);
+        
+        REQUIRE(solution.size() == 6);
+        
+        // Verify all constraints are satisfied
+        for (size_t i = 0; i < state.nr_digits; i++) {
+            float sum = 0.0f;
+            for (size_t j = 0; j < state.transitions.size(); j++) {
+                sum += solution[j] * state.transitions[j][i];
+            }
+            CHECK(std::abs(sum - state.final_values[i]) < 0.1f);
+        }
+        
+        // All solutions should be non-negative
+        for (size_t i = 0; i < solution.size(); i++) {
+            CHECK(solution[i] >= -0.01f);
+        }
+    }
+    
+    TEST_CASE("solve_simplex - problem from sample input line 2") {
+        // Parse the second line from the sample input
+        std::string_view input = "[...#.] (0,2,3,4) (2,3) (0,4) (0,1,2) (1,2,3,4) {7,5,12,7,2}";
+        auto state = parse_line_integer(input);
+        
+        REQUIRE(state.nr_digits == 5);
+        REQUIRE(state.transitions.size() == 5);
+        REQUIRE(state.final_values.size() == 5);
+        
+        auto solution = solve_simplex(state);
+        
+        REQUIRE(solution.size() == 5);
+        
+        // Verify all constraints are satisfied
+        for (size_t i = 0; i < state.nr_digits; i++) {
+            float sum = 0.0f;
+            for (size_t j = 0; j < state.transitions.size(); j++) {
+                sum += solution[j] * state.transitions[j][i];
+            }
+            CHECK(std::abs(sum - state.final_values[i]) < 0.1f);
+        }
+        
+        // All solutions should be non-negative
+        for (size_t i = 0; i < solution.size(); i++) {
+            CHECK(solution[i] >= -0.01f);
+        }
+    }
+    
+    TEST_CASE("solve_simplex - problem from sample input line 3") {
+        // Parse the third line from the sample input
+        std::string_view input = "[.###.#] (0,1,2,3,4) (0,3,4) (0,1,2,4,5) (1,2) {10,11,11,5,10,5}";
+        auto state = parse_line_integer(input);
+        
+        REQUIRE(state.nr_digits == 6);
+        REQUIRE(state.transitions.size() == 4);
+        REQUIRE(state.final_values.size() == 6);
+        
+        auto solution = solve_simplex(state);
+        
+        REQUIRE(solution.size() == 4);
+        
+        // Verify all constraints are satisfied
+        for (size_t i = 0; i < state.nr_digits; i++) {
+            float sum = 0.0f;
+            for (size_t j = 0; j < state.transitions.size(); j++) {
+                sum += solution[j] * state.transitions[j][i];
+            }
+            CHECK(std::abs(sum - state.final_values[i]) < 0.1f);
+        }
+        
+        // All solutions should be non-negative
+        for (size_t i = 0; i < solution.size(); i++) {
+            CHECK(solution[i] >= -0.01f);
+        }
+    }
+    
+    TEST_CASE("solve_simplex - fractional solution") {
+        // Minimize: x1 + x2
+        // Subject to: 3*x1 + 2*x2 = 10
+        //            x1 + x2 = 4
+        //            x1, x2 >= 0
+        // Expected solution involves fractions
+        IntegerState state;
+        state.nr_digits = 2;
+        state.transitions = {
+            {3.0f, 1.0f},  // x1
+            {2.0f, 1.0f}   // x2
+        };
+        state.final_values = {10.0f, 4.0f};
+        
+        auto solution = solve_simplex(state);
+        
+        REQUIRE(solution.size() == 2);
+        
+        // Verify constraints
+        float constraint1 = 3.0f * solution[0] + 2.0f * solution[1];
+        float constraint2 = solution[0] + solution[1];
+        
+        CHECK(std::abs(constraint1 - 10.0f) < 0.01f);
+        CHECK(std::abs(constraint2 - 4.0f) < 0.01f);
+        
+        // All solutions should be non-negative
+        CHECK(solution[0] >= -0.01f);
+        CHECK(solution[1] >= -0.01f);
+    }
+    
+    TEST_CASE("solve_simplex - single variable single constraint") {
+        // Minimize: x1
+        // Subject to: 2*x1 = 8
+        //            x1 >= 0
+        // Expected solution: x1 = 4
+        IntegerState state;
+        state.nr_digits = 1;
+        state.transitions = {
+            {2.0f}  // x1
+        };
+        state.final_values = {8.0f};
+        
+        auto solution = solve_simplex(state);
+        
+        REQUIRE(solution.size() == 1);
+        CHECK(std::abs(solution[0] - 4.0f) < 0.01f);
+    }
+    
+    TEST_CASE("solve_simplex - empty state returns empty solution") {
+        IntegerState state;
+        state.nr_digits = 0;
+        state.transitions = {};
+        state.final_values = {};
+        
+        auto solution = solve_simplex(state);
+        
+        CHECK(solution.empty());
+    }
+    
+    TEST_CASE("solve_simplex - larger system with 10 variables") {
+        // Create a larger system to test scalability
+        IntegerState state;
+        state.nr_digits = 5;
+        
+        // Create 10 transitions, each affecting different combinations of digits
+        state.transitions = {
+            {1.0f, 0.0f, 0.0f, 0.0f, 1.0f},
+            {0.0f, 1.0f, 0.0f, 0.0f, 1.0f},
+            {0.0f, 0.0f, 1.0f, 0.0f, 1.0f},
+            {0.0f, 0.0f, 0.0f, 1.0f, 1.0f},
+            {1.0f, 1.0f, 0.0f, 0.0f, 0.0f},
+            {0.0f, 1.0f, 1.0f, 0.0f, 0.0f},
+            {0.0f, 0.0f, 1.0f, 1.0f, 0.0f},
+            {1.0f, 0.0f, 0.0f, 1.0f, 0.0f},
+            {1.0f, 0.0f, 1.0f, 0.0f, 0.0f},
+            {0.0f, 1.0f, 0.0f, 1.0f, 0.0f}
+        };
+        state.final_values = {10.0f, 15.0f, 20.0f, 12.0f, 8.0f};
+        
+        auto solution = solve_simplex(state);
+        
+        REQUIRE(solution.size() == 10);
+        
+        // Verify all constraints are satisfied
+        for (size_t i = 0; i < state.nr_digits; i++) {
+            float sum = 0.0f;
+            for (size_t j = 0; j < state.transitions.size(); j++) {
+                sum += solution[j] * state.transitions[j][i];
+            }
+            CHECK(std::abs(sum - state.final_values[i]) < 0.1f);
+        }
+        
+        // All solutions should be non-negative
+        for (size_t i = 0; i < solution.size(); i++) {
+            CHECK(solution[i] >= -0.01f);
+        }
+    }
 }
