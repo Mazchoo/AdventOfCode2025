@@ -388,11 +388,10 @@ namespace day10
                 target_sum += val;
 
             // Priority queue: pair of (priority, state)
-            // Priority is the absolute difference from target sum (lower is better)
-            // We use negative priority for max heap behavior (to get min priority)
+            // Priority is a higher sum with less moves (higher is better)
             auto compare = [](const std::pair<float, std::vector<uint8_t>>& a,
                             const std::pair<float, std::vector<uint8_t>>& b) {
-                return a.first > b.first; // Min heap based on priority
+                return a.first < b.first; // Min heap based on priority
             };
             std::priority_queue<std::pair<float, std::vector<uint8_t>>,
                               std::vector<std::pair<float, std::vector<uint8_t>>>,
@@ -419,14 +418,17 @@ namespace day10
                         if (transition[i] > 0)
                             slack_constraint = std::min<uint8_t>(slack_constraint, target_state[i] - new_state[i]);
                     }
+                    if (slack_constraint > 1) 
+                        slack_constraint /= 2;
 
                     for (int i = 0; i < state.nr_digits; i++)
                         new_state[i] += transition[i] * slack_constraint;
 
                     if (new_state == target_state) {
                         solution_found = true;
-                        min_presses = std::min<uint32_t>(min_presses, current_presses + slack_constraint);
-                        continue;
+                        min_presses = current_presses + slack_constraint;
+                        std::cout << min_presses;
+                        break;
                     }
 
                     if (slack_constraint == 0)
@@ -447,11 +449,14 @@ namespace day10
                     solution[new_state] = current_presses + slack_constraint;
                     candidates.push({new_priority, new_state});
                 }
+
+                if (solution_found)
+                    break;
             }
             if (solution_found) {
                 result += min_presses;
             } else {
-                std::cout << "Oh no";
+                std::cout << "Oh no\n";
             }
 
         }
