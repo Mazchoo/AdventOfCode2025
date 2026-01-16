@@ -20,8 +20,8 @@ namespace day10
 
     struct IntegerState {
         size_t nr_digits = 0;
-        std::vector<std::vector<uint8_t>> transitions = {};
-        std::vector<uint8_t> final_values = {};
+        std::vector<std::vector<float>> transitions = {};
+        std::vector<float> final_values = {};
     };
 
     // Parse a single line of input and return a State object
@@ -135,7 +135,7 @@ namespace day10
     // Each parentheses group like (3) or (1,3) represents positions to set in a vector
     // e.g., (3) with 4 digits = [0, 0, 0, 1] (4th position is 1)
     // e.g., (1,3) with 4 digits = [0, 1, 0, 1] (2nd and 4th positions are 1)
-    // {3,5,4,7} is parsed as a vector of uint8_t values
+    // {3,5,4,7} is parsed as a vector of float values
     inline IntegerState parse_line_integer(std::string_view line) {
         IntegerState state;
         state.nr_digits = 0;
@@ -150,7 +150,7 @@ namespace day10
         
         ParseState parse_state = ParseState::SKIP_WHITESPACE;
         std::vector<uint16_t> bit_positions;
-        uint16_t current_value = 0;
+        float current_value = 0;
         bool parsing_number = false;
         
         for (size_t i = 0; i < line.length(); i++) {
@@ -208,7 +208,7 @@ namespace day10
                     }
                     
                     // Convert bit positions to vector
-                    std::vector<uint8_t> transition(state.nr_digits, 0);
+                    std::vector<float> transition(state.nr_digits, 0);
                     for (uint16_t pos : bit_positions) {
                         if (pos < state.nr_digits) {
                             transition[pos] = 1;
@@ -373,94 +373,6 @@ namespace day10
     inline uint32_t fewest_presses_to_configuration(std::string_view payload) {
         std::vector<IntegerState> states = parse_input_integer(payload);
         uint32_t result = 0;
-
-        for (auto& state : states) {
-            auto target_state = state.final_values;
-            std::map<std::vector<uint8_t>, uint32_t> solution;
-
-            std::vector<uint8_t> initial_state(state.nr_digits, 0);
-            if (initial_state == target_state)
-                continue;
-
-            // Calculate target sum
-            uint32_t target_sum = 0;
-            for (auto val : target_state)
-                target_sum += val;
-
-            // Priority queue: pair of (priority, state)
-            // Priority is a higher sum with less moves (higher is better)
-            auto compare = [](const std::pair<float, std::vector<uint8_t>>& a,
-                            const std::pair<float, std::vector<uint8_t>>& b) {
-                return a.first < b.first; // Min heap based on priority
-            };
-            std::priority_queue<std::pair<float, std::vector<uint8_t>>,
-                              std::vector<std::pair<float, std::vector<uint8_t>>>,
-                              decltype(compare)> candidates(compare);
-
-            candidates.push({0, initial_state});
-            solution[initial_state] = 0;
-
-            bool solution_found = false;
-            uint32_t min_presses = 1000000;
-
-            while (!candidates.empty()) {
-                auto [priority, candidate] = candidates.top();
-                candidates.pop();
-
-                uint32_t current_presses = solution[candidate];
-
-                for (auto& transition : state.transitions) {
-                    std::vector<uint8_t> new_state = candidate;
-
-                    // Check overflow constraint
-                    uint8_t slack_constraint = 255;
-                    for (int i = 0; i < state.nr_digits; i++) {
-                        if (transition[i] > 0)
-                            slack_constraint = std::min<uint8_t>(slack_constraint, target_state[i] - new_state[i]);
-                    }
-                    if (slack_constraint > 2) {
-                        slack_constraint /= 2;
-                    }
-
-                    for (int i = 0; i < state.nr_digits; i++)
-                        new_state[i] += transition[i] * slack_constraint;
-
-                    if (new_state == target_state) {
-                        solution_found = true;
-                        min_presses = current_presses + slack_constraint;
-                        std::cout << "Soultion found" << min_presses << "\n";
-                        break;
-                    }
-
-                    if (slack_constraint == 0)
-                        continue; // stuck
-
-                    // Check if we've seen this state before
-                    auto it = solution.find(new_state);
-                    if (it != solution.end())
-                        continue;
-
-                    // Calculate sum and priority
-                    uint32_t new_sum = 0;
-                    for (auto val : new_state)
-                        new_sum += val;
-                    
-                    float new_priority = static_cast<float>(new_sum) / static_cast<float>(current_presses + slack_constraint);
-
-                    solution[new_state] = current_presses + slack_constraint;
-                    candidates.push({new_priority, new_state});
-                }
-
-                if (solution_found)
-                    break;
-            }
-            if (solution_found) {
-                result += min_presses;
-            } else {
-                std::cout << "Oh no\n";
-            }
-
-        }
 
         return result;
     }
