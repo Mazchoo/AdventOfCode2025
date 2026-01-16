@@ -13,15 +13,15 @@
 namespace day10
 {
     struct BooleanState {
-        size_t nr_digits;
-        uint16_t initial_state;
-        std::vector<uint16_t> transitions;
+        size_t nr_digits = 0;
+        uint16_t initial_state = {};
+        std::vector<uint16_t> transitions = {};
     };
 
     struct IntegerState {
-        size_t nr_digits;
-        std::vector<std::vector<uint8_t>> transitions;
-        std::vector<uint8_t> final_values;
+        size_t nr_digits = 0;
+        std::vector<std::vector<uint8_t>> transitions = {};
+        std::vector<uint8_t> final_values = {};
     };
 
     // Parse a single line of input and return a State object
@@ -418,8 +418,9 @@ namespace day10
                         if (transition[i] > 0)
                             slack_constraint = std::min<uint8_t>(slack_constraint, target_state[i] - new_state[i]);
                     }
-                    if (slack_constraint > 1) 
+                    if (slack_constraint > 2) {
                         slack_constraint /= 2;
+                    }
 
                     for (int i = 0; i < state.nr_digits; i++)
                         new_state[i] += transition[i] * slack_constraint;
@@ -427,7 +428,7 @@ namespace day10
                     if (new_state == target_state) {
                         solution_found = true;
                         min_presses = current_presses + slack_constraint;
-                        std::cout << min_presses;
+                        std::cout << "Soultion found" << min_presses << "\n";
                         break;
                     }
 
