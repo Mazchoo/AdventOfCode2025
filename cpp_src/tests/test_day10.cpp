@@ -300,54 +300,31 @@ TEST_SUITE("Day10 Tests") {
     TEST_CASE("parse_line_integer - with single parenthesis") {
         std::string_view input = "[.##.] (3)";
         auto state = parse_line_integer(input);
-        
+
         CHECK(state.nr_digits == 4);
         REQUIRE(state.transitions.size() == 1);
-        REQUIRE(state.transitions[0].size() == 4);
-        CHECK(state.transitions[0][0] == 0);
-        CHECK(state.transitions[0][1] == 0);
-        CHECK(state.transitions[0][2] == 0);
-        CHECK(state.transitions[0][3] == 1);  // Position 3 is set
+        CHECK(state.transitions[0] == 0b1000);  // Bit 3 set
         CHECK(state.final_values.empty());
     }
     
     TEST_CASE("parse_line_integer - with multiple positions in one parenthesis") {
         std::string_view input = "[.##.] (1,3)";
         auto state = parse_line_integer(input);
-        
+
         CHECK(state.nr_digits == 4);
         REQUIRE(state.transitions.size() == 1);
-        REQUIRE(state.transitions[0].size() == 4);
-        CHECK(state.transitions[0][0] == 0);
-        CHECK(state.transitions[0][1] == 1);  // Position 1 is set
-        CHECK(state.transitions[0][2] == 0);
-        CHECK(state.transitions[0][3] == 1);  // Position 3 is set
+        CHECK(state.transitions[0] == 0b1010);  // Bits 1 and 3 set
     }
     
     TEST_CASE("parse_line_integer - multiple parentheses groups") {
         std::string_view input = "[.##.] (3) (1,3) (2)";
         auto state = parse_line_integer(input);
-        
+
         CHECK(state.nr_digits == 4);
         REQUIRE(state.transitions.size() == 3);
-        
-        // First transition: (3)
-        CHECK(state.transitions[0][3] == 1);
-        CHECK(state.transitions[0][0] == 0);
-        CHECK(state.transitions[0][1] == 0);
-        CHECK(state.transitions[0][2] == 0);
-        
-        // Second transition: (1,3)
-        CHECK(state.transitions[1][1] == 1);
-        CHECK(state.transitions[1][3] == 1);
-        CHECK(state.transitions[1][0] == 0);
-        CHECK(state.transitions[1][2] == 0);
-        
-        // Third transition: (2)
-        CHECK(state.transitions[2][2] == 1);
-        CHECK(state.transitions[2][0] == 0);
-        CHECK(state.transitions[2][1] == 0);
-        CHECK(state.transitions[2][3] == 0);
+        CHECK(state.transitions[0] == 0b1000);  // (3) = bit 3
+        CHECK(state.transitions[1] == 0b1010);  // (1,3) = bits 1 and 3
+        CHECK(state.transitions[2] == 0b0100);  // (2) = bit 2
     }
     
     TEST_CASE("parse_line_integer - with curly braces section") {
@@ -366,35 +343,33 @@ TEST_SUITE("Day10 Tests") {
     TEST_CASE("parse_line_integer - complex example from sample") {
         std::string_view input = "[.##.] (3) (1,3) (2) (2,3) (0,2) (0,1) {3,5,4,7}";
         auto state = parse_line_integer(input);
-        
+
         CHECK(state.nr_digits == 4);
         REQUIRE(state.transitions.size() == 6);
         REQUIRE(state.final_values.size() == 4);
-        
+
         // Verify final values
         CHECK(state.final_values[0] == 3);
         CHECK(state.final_values[1] == 5);
         CHECK(state.final_values[2] == 4);
         CHECK(state.final_values[3] == 7);
-        
-        // Verify some transitions
-        CHECK(state.transitions[0][3] == 1);  // (3)
-        CHECK(state.transitions[5][0] == 1);  // (0,1)
-        CHECK(state.transitions[5][1] == 1);
+
+        // Verify transitions
+        CHECK(state.transitions[0] == 0b1000);  // (3)
+        CHECK(state.transitions[1] == 0b1010);  // (1,3)
+        CHECK(state.transitions[2] == 0b0100);  // (2)
+        CHECK(state.transitions[3] == 0b1100);  // (2,3)
+        CHECK(state.transitions[4] == 0b0101);  // (0,2)
+        CHECK(state.transitions[5] == 0b0011);  // (0,1)
     }
     
     TEST_CASE("parse_line_integer - empty parentheses") {
         std::string_view input = "[.##.] ()";
         auto state = parse_line_integer(input);
-        
+
         CHECK(state.nr_digits == 4);
         REQUIRE(state.transitions.size() == 1);
-        REQUIRE(state.transitions[0].size() == 4);
-        // All positions should be 0
-        CHECK(state.transitions[0][0] == 0);
-        CHECK(state.transitions[0][1] == 0);
-        CHECK(state.transitions[0][2] == 0);
-        CHECK(state.transitions[0][3] == 0);
+        CHECK(state.transitions[0] == 0);  // Empty parentheses = no bits set
     }
     
     TEST_CASE("parse_line_integer - with whitespace") {
@@ -411,18 +386,10 @@ TEST_SUITE("Day10 Tests") {
     TEST_CASE("parse_line_integer - longer initial state") {
         std::string_view input = "[.#.#.#.#] (0,2,4,6)";
         auto state = parse_line_integer(input);
-        
+
         CHECK(state.nr_digits == 8);
         REQUIRE(state.transitions.size() == 1);
-        REQUIRE(state.transitions[0].size() == 8);
-        CHECK(state.transitions[0][0] == 1);
-        CHECK(state.transitions[0][2] == 1);
-        CHECK(state.transitions[0][4] == 1);
-        CHECK(state.transitions[0][6] == 1);
-        CHECK(state.transitions[0][1] == 0);
-        CHECK(state.transitions[0][3] == 0);
-        CHECK(state.transitions[0][5] == 0);
-        CHECK(state.transitions[0][7] == 0);
+        CHECK(state.transitions[0] == 0b01010101);  // Bits 0, 2, 4, 6 set
     }
     
     TEST_CASE("parse_line_integer - curly braces with single value") {

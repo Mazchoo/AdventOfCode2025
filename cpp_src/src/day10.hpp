@@ -19,8 +19,8 @@ namespace day10
     };
 
     struct IntegerState {
-        size_t nr_digits = 0; // Needs to be nr transitions (or ignore it)
-        std::vector<std::vector<uint8_t>> transitions = {}; // needs to be uint16_t
+        size_t nr_digits = 0;
+        std::vector<uint16_t> transitions = {};
         std::vector<uint8_t> final_values = {};
     };
 
@@ -206,15 +206,13 @@ namespace day10
                         current_value = 0;
                         parsing_number = false;
                     }
-                    
-                    // Convert bit positions to vector
-                    std::vector<uint8_t> transition(state.nr_digits, 0);
+
+                    // Convert bit positions to bitmask
+                    uint16_t bitmask = 0;
                     for (uint16_t pos : bit_positions) {
-                        if (pos < state.nr_digits) {
-                            transition[pos] = 1;
-                        }
+                        bitmask |= (1 << pos);
                     }
-                    state.transitions.push_back(transition);
+                    state.transitions.push_back(bitmask);
                     bit_positions.clear();
                     continue;
                 }
@@ -420,15 +418,17 @@ namespace day10
                     // Check overflow constraint
                     uint8_t slack_constraint = 255;
                     for (int i = 0; i < state.nr_digits; i++) {
-                        if (transition[i] > 0)
+                        if (transition & (1 << i))
                             slack_constraint = std::min<uint8_t>(slack_constraint, target_state[i] - new_state[i]);
                     }
                     if (slack_constraint > 2) {
                         slack_constraint /= 2;
                     }
 
-                    for (int i = 0; i < state.nr_digits; i++)
-                        new_state[i] += transition[i] * slack_constraint;
+                    for (int i = 0; i < state.nr_digits; i++) {
+                        if (transition & (1 << i))
+                            new_state[i] += slack_constraint;
+                    }
 
                     if (new_state == target_state) {
                         solution_found = true;
