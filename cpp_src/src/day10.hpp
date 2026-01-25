@@ -97,6 +97,14 @@ namespace day10
         return true;
     }
 
+    // Halve all values in a solution vector in place
+    // Each element is divided by 2 (integer division)
+    inline void reduce_even_solution(std::vector<uint8_t>& solution) {
+        for (auto& val : solution) {
+            val /= 2;
+        }
+    }
+
     // Parse a single line of input and return a State object
     // Format: [.##.] (3) (1,3) (2) (2,3) (0,2) (0,1) {3,5,4,7}
     // The initial state [.##.] is converted to a bitwise uint16_t
@@ -395,7 +403,7 @@ namespace day10
         return states;
     }
 
-    inline uint32_t fewest_button_presses(std::string_view payload) {
+    uint32_t fewest_button_presses(std::string_view payload) {
         std::vector<BooleanState> states = parse_input_boolean(payload);
         uint32_t result = 0;
 
@@ -443,99 +451,9 @@ namespace day10
     // In each case subtract that state from the final state which will be series of even
     // numbers, and then half the even numbers and solve the state recursively
     // until all numbers are 1 or 0
-    inline uint32_t fewest_presses_to_configuration(std::string_view payload) {
+    uint32_t fewest_presses_to_configuration(std::string_view payload) {
         std::vector<IntegerState> states = parse_input_integer(payload);
         uint32_t result = 0;
-
-        for (auto& state : states) {
-            auto target_state = state.final_values;
-            std::map<std::vector<uint8_t>, uint32_t> solution;
-
-            std::vector<uint8_t> initial_state(state.final_values.size(), 0);
-            if (initial_state == target_state)
-                continue;
-
-            // Calculate target sum
-            uint32_t target_sum = 0;
-            for (auto val : target_state)
-                target_sum += val;
-
-            // Priority queue: pair of (priority, state)
-            // Priority is a higher sum with less moves (higher is better)
-            auto compare = [](const std::pair<float, std::vector<uint8_t>>& a,
-                            const std::pair<float, std::vector<uint8_t>>& b) {
-                return a.first < b.first; // Min heap based on priority
-            };
-            std::priority_queue<std::pair<float, std::vector<uint8_t>>,
-                              std::vector<std::pair<float, std::vector<uint8_t>>>,
-                              decltype(compare)> candidates(compare);
-
-            candidates.push({0, initial_state});
-            solution[initial_state] = 0;
-
-            bool solution_found = false;
-            uint32_t min_presses = 1000000;
-
-            while (!candidates.empty()) {
-                auto [priority, candidate] = candidates.top();
-                candidates.pop();
-
-                uint32_t current_presses = solution[candidate];
-
-                for (auto& transition : state.transitions) {
-                    std::vector<uint8_t> new_state = candidate;
-
-                    // Check overflow constraint
-                    uint8_t slack_constraint = 255;
-                    for (int i = 0; i < state.final_values.size(); i++) {
-                        if (transition & (1 << i))
-                            slack_constraint = std::min<uint8_t>(slack_constraint, target_state[i] - new_state[i]);
-                    }
-                    if (slack_constraint > 2) {
-                        slack_constraint /= 2;
-                    }
-
-                    for (int i = 0; i < state.final_values.size(); i++) {
-                        if (transition & (1 << i))
-                            new_state[i] += slack_constraint;
-                    }
-
-                    if (new_state == target_state) {
-                        solution_found = true;
-                        min_presses = current_presses + slack_constraint;
-                        std::cout << "Soultion found" << min_presses << "\n";
-                        break;
-                    }
-
-                    if (slack_constraint == 0)
-                        continue; // stuck
-
-                    // Check if we've seen this state before
-                    auto it = solution.find(new_state);
-                    if (it != solution.end())
-                        continue;
-
-                    // Calculate sum and priority
-                    uint32_t new_sum = 0;
-                    for (auto val : new_state)
-                        new_sum += val;
-                    
-                    float new_priority = static_cast<float>(new_sum) / static_cast<float>(current_presses + slack_constraint);
-
-                    solution[new_state] = current_presses + slack_constraint;
-                    candidates.push({new_priority, new_state});
-                }
-
-                if (solution_found)
-                    break;
-            }
-            if (solution_found) {
-                result += min_presses;
-            } else {
-                std::cout << "Oh no\n";
-            }
-
-        }
 
         return result;
     }
