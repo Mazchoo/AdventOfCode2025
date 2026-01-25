@@ -19,8 +19,8 @@ namespace day10
     };
 
     struct IntegerState {
-        size_t nr_digits = 0;
-        std::vector<std::vector<uint8_t>> transitions = {};
+        size_t nr_digits = 0; // Needs to be nr transitions (or ignore it)
+        std::vector<std::vector<uint8_t>> transitions = {}; // needs to be uint16_t
         std::vector<uint8_t> final_values = {};
     };
 
