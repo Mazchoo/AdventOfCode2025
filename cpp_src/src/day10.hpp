@@ -24,6 +24,19 @@ namespace day10
         std::vector<uint8_t> final_values = {};
     };
 
+    // Convert a vector of uint8_t values to a uint16_t bitmask
+    // where each bit represents whether the corresponding value is odd (1) or even (0)
+    // e.g., {3, 5, 4, 7} -> bits at positions 0,1,3 set (odd values) -> 0b1011
+    inline uint16_t vector_to_odd_even_bitmask(const std::vector<uint8_t>& values) {
+        uint16_t bitmask = 0;
+        for (size_t i = 0; i < values.size() && i < 16; i++) {
+            if (values[i] & 1) {  // Check if odd
+                bitmask |= (1 << i);
+            }
+        }
+        return bitmask;
+    }
+
     // Parse a single line of input and return a State object
     // Format: [.##.] (3) (1,3) (2) (2,3) (0,2) (0,1) {3,5,4,7}
     // The initial state [.##.] is converted to a bitwise uint16_t
