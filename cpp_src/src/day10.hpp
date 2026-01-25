@@ -36,6 +36,19 @@ namespace day10
         return bitmask;
     }
 
+    // Extract a boolean array from a transition combination bitmask
+    // Each bit in the transition_combination maps to a boolean value in the result
+    // e.g., transition_combination = 0b1011, nr_transitions = 4 -> {true, true, false, true}
+    inline std::vector<bool> extract_states_from_combination(uint16_t transition_combination, size_t nr_transitions) {
+        std::vector<bool> states(nr_transitions, false);
+        for (size_t i = 0; i < nr_transitions && i < 16; i++) {
+            if (transition_combination & (1 << i)) {
+                states[i] = true;
+            }
+        }
+        return states;
+    }
+
     // Count the number of true values in a boolean vector
     inline size_t nr_transitions_in_presses(const std::vector<bool>& states_used) {
         size_t count = 0;
