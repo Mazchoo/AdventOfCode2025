@@ -370,6 +370,11 @@ namespace day10
         return result;
     }
 
+    // Find every solution in the solution space that can provide the odd and even numbers
+    // in a configuation
+    // In each case subtract that state from the final state which will be series of even
+    // numbers, and then half the even numbers and solve the state recursively
+    // until all numbers are 1 or 0
     inline uint32_t fewest_presses_to_configuration(std::string_view payload) {
         std::vector<IntegerState> states = parse_input_integer(payload);
         uint32_t result = 0;
