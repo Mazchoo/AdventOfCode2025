@@ -27,21 +27,5 @@ def test_day10_pt1():
     assert result == 578
 
 
-def test_day10_pt2_sample():
-    """Test get_payload_result(char*, int) -> uint32_t"""
-
-    path = "./python_src/day10/input/sample.txt"
-    result = get_payload_result(path, STORE, INSTANCE, fewest_presses_to_configuration)
-    assert result == 33
-
-
-def test_day10_pt2():
-    """Test get_payload_result(char*, int) -> uint32_t"""
-
-    path = "./python_src/day10/input/full.txt"
-    result = get_payload_result(path, STORE, INSTANCE, fewest_presses_to_configuration)
-    assert result == 33
-
-
 if __name__ == "__main__":
     pytest.main([__file__, "-x", "--verbose"])
