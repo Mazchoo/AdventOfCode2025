@@ -73,6 +73,30 @@ namespace day10
         return result;
     }
 
+    // Subtract counts_update from target and update counts_update in place
+    // Returns true if operation is valid (counts_update[i] <= target[i] for all i)
+    // If valid, sets counts_update[i] = target[i] - counts_update[i]
+    // If invalid, returns false and leaves counts_update unchanged
+    inline bool subtract_and_update(std::vector<uint8_t>& counts_update, const std::vector<uint8_t>& target) {
+        // Check if operation is valid
+        if (counts_update.size() != target.size()) {
+            return false;
+        }
+
+        for (size_t i = 0; i < counts_update.size(); i++) {
+            if (counts_update[i] > target[i]) {
+                return false;
+            }
+        }
+
+        // Perform subtraction in place
+        for (size_t i = 0; i < counts_update.size(); i++) {
+            counts_update[i] = target[i] - counts_update[i];
+        }
+
+        return true;
+    }
+
     // Parse a single line of input and return a State object
     // Format: [.##.] (3) (1,3) (2) (2,3) (0,2) (0,1) {3,5,4,7}
     // The initial state [.##.] is converted to a bitwise uint16_t
