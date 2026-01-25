@@ -19,7 +19,6 @@ namespace day10
     };
 
     struct IntegerState {
-        size_t nr_digits = 0;
         std::vector<uint16_t> transitions = {};
         std::vector<uint8_t> final_values = {};
     };
@@ -35,6 +34,43 @@ namespace day10
             }
         }
         return bitmask;
+    }
+
+    // Count the number of true values in a boolean vector
+    inline size_t nr_transitions_in_presses(const std::vector<bool>& states_used) {
+        size_t count = 0;
+        for (bool state : states_used) {
+            if (state) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    // Count how many times each bit position is set across used transitions
+    // For each transition that is marked as used (states_used[i] == true),
+    // increment the count at each index where that transition has a 1 bit
+    // e.g., transitions = {0b00100, 0b11000, 0b10000}, states_used = {true, true, true}
+    //       -> [2, 1, 1, 0, 0] (bit 0 appears in 2 transitions, bit 1 in 1, bit 2 in 1)
+    inline std::vector<uint8_t> count_transition_bits(
+        const std::vector<uint16_t>& transitions,
+        const std::vector<bool>& states_used,
+        size_t solution_length
+    ) {
+        std::vector<uint8_t> result(solution_length, 0);
+
+        for (size_t i = 0; i < transitions.size() && i < states_used.size(); i++) {
+            if (states_used[i]) {
+                uint16_t transition = transitions[i];
+                for (size_t bit = 0; bit < solution_length && bit < 16; bit++) {
+                    if (transition & (1 << bit)) {
+                        result[bit]++;
+                    }
+                }
+            }
+        }
+
+        return result;
     }
 
     // Parse a single line of input and return a State object
@@ -151,7 +187,6 @@ namespace day10
     // {3,5,4,7} is parsed as a vector of uint8_t values
     inline IntegerState parse_line_integer(std::string_view line) {
         IntegerState state;
-        state.nr_digits = 0;
         
         enum class ParseState {
             SKIP_WHITESPACE,
@@ -180,9 +215,7 @@ namespace day10
             }
             
             if (parse_state == ParseState::PARSE_INITIAL_STATE) {
-                if (c == '#' || c == '.') {
-                    state.nr_digits++;
-                } else if (c == ']') {
+                if (c == ']') {
                     parse_state = ParseState::PARSE_PARENTHESES;
                 }
                 continue;
@@ -394,7 +427,7 @@ namespace day10
             auto target_state = state.final_values;
             std::map<std::vector<uint8_t>, uint32_t> solution;
 
-            std::vector<uint8_t> initial_state(state.nr_digits, 0);
+            std::vector<uint8_t> initial_state(state.final_values.size(), 0);
             if (initial_state == target_state)
                 continue;
 
@@ -430,7 +463,7 @@ namespace day10
 
                     // Check overflow constraint
                     uint8_t slack_constraint = 255;
-                    for (int i = 0; i < state.nr_digits; i++) {
+                    for (int i = 0; i < state.final_values.size(); i++) {
                         if (transition & (1 << i))
                             slack_constraint = std::min<uint8_t>(slack_constraint, target_state[i] - new_state[i]);
                     }
@@ -438,7 +471,7 @@ namespace day10
                         slack_constraint /= 2;
                     }
 
-                    for (int i = 0; i < state.nr_digits; i++) {
+                    for (int i = 0; i < state.final_values.size(); i++) {
                         if (transition & (1 << i))
                             new_state[i] += slack_constraint;
                     }

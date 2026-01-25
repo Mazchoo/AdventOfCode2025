@@ -182,7 +182,6 @@ TEST_SUITE("Day10 Tests") {
         auto states = parse_input_boolean(input);
         
         REQUIRE(states.size() == 1);
-        CHECK(states[0].nr_digits == 4);
         CHECK(states[0].initial_state == 0b0110);
         CHECK(states[0].transitions.size() == 2);
     }
@@ -194,17 +193,14 @@ TEST_SUITE("Day10 Tests") {
         REQUIRE(states.size() == 3);
         
         // First line
-        CHECK(states[0].nr_digits == 4);
         CHECK(states[0].initial_state == 0b0110);
         CHECK(states[0].transitions.size() == 1);
         
         // Second line
-        CHECK(states[1].nr_digits == 4);
         CHECK(states[1].initial_state == 0b1111);
         CHECK(states[1].transitions.size() == 1);
         
         // Third line
-        CHECK(states[2].nr_digits == 4);
         CHECK(states[2].initial_state == 0b0000);
         CHECK(states[2].transitions.size() == 1);
     }
@@ -222,7 +218,6 @@ TEST_SUITE("Day10 Tests") {
         auto states = parse_input_boolean(input);
         
         REQUIRE(states.size() == 2);
-        CHECK(states[1].nr_digits == 4);
         CHECK(states[1].initial_state == 0b1111);
     }
     
@@ -243,17 +238,14 @@ TEST_SUITE("Day10 Tests") {
         REQUIRE(states.size() == 3);
         
         // First line - complex state changes
-        CHECK(states[0].nr_digits == 4);
         CHECK(states[0].initial_state == 0b0110);
         CHECK(states[0].transitions.size() == 6);
         
         // Second line - individual bits
-        CHECK(states[1].nr_digits == 4);
         CHECK(states[1].initial_state == 0b1111);
         CHECK(states[1].transitions.size() == 4);
         
         // Third line - all bits in one group
-        CHECK(states[2].nr_digits == 4);
         CHECK(states[2].initial_state == 0b0000);
         CHECK(states[2].transitions.size() == 1);
         CHECK(states[2].transitions[0] == 0b1111);
@@ -264,7 +256,6 @@ TEST_SUITE("Day10 Tests") {
         auto states = parse_input_boolean(input);
         
         REQUIRE(states.size() == 1);
-        CHECK(states[0].nr_digits == 4);
     }
     
     TEST_CASE("parse_line - empty parentheses should not add state change") {
@@ -291,8 +282,7 @@ TEST_SUITE("Day10 Tests") {
     TEST_CASE("parse_line_integer - simple initial state") {
         std::string_view input = "[.##.]";
         auto state = parse_line_integer(input);
-        
-        CHECK(state.nr_digits == 4);
+
         CHECK(state.transitions.empty());
         CHECK(state.final_values.empty());
     }
@@ -301,7 +291,6 @@ TEST_SUITE("Day10 Tests") {
         std::string_view input = "[.##.] (3)";
         auto state = parse_line_integer(input);
 
-        CHECK(state.nr_digits == 4);
         REQUIRE(state.transitions.size() == 1);
         CHECK(state.transitions[0] == 0b1000);  // Bit 3 set
         CHECK(state.final_values.empty());
@@ -311,7 +300,6 @@ TEST_SUITE("Day10 Tests") {
         std::string_view input = "[.##.] (1,3)";
         auto state = parse_line_integer(input);
 
-        CHECK(state.nr_digits == 4);
         REQUIRE(state.transitions.size() == 1);
         CHECK(state.transitions[0] == 0b1010);  // Bits 1 and 3 set
     }
@@ -320,7 +308,6 @@ TEST_SUITE("Day10 Tests") {
         std::string_view input = "[.##.] (3) (1,3) (2)";
         auto state = parse_line_integer(input);
 
-        CHECK(state.nr_digits == 4);
         REQUIRE(state.transitions.size() == 3);
         CHECK(state.transitions[0] == 0b1000);  // (3) = bit 3
         CHECK(state.transitions[1] == 0b1010);  // (1,3) = bits 1 and 3
@@ -330,8 +317,7 @@ TEST_SUITE("Day10 Tests") {
     TEST_CASE("parse_line_integer - with curly braces section") {
         std::string_view input = "[.##.] (3) (1,3) {3,5,4,7}";
         auto state = parse_line_integer(input);
-        
-        CHECK(state.nr_digits == 4);
+
         REQUIRE(state.transitions.size() == 2);
         REQUIRE(state.final_values.size() == 4);
         CHECK(state.final_values[0] == 3);
@@ -344,7 +330,6 @@ TEST_SUITE("Day10 Tests") {
         std::string_view input = "[.##.] (3) (1,3) (2) (2,3) (0,2) (0,1) {3,5,4,7}";
         auto state = parse_line_integer(input);
 
-        CHECK(state.nr_digits == 4);
         REQUIRE(state.transitions.size() == 6);
         REQUIRE(state.final_values.size() == 4);
 
@@ -367,7 +352,6 @@ TEST_SUITE("Day10 Tests") {
         std::string_view input = "[.##.] ()";
         auto state = parse_line_integer(input);
 
-        CHECK(state.nr_digits == 4);
         REQUIRE(state.transitions.size() == 1);
         CHECK(state.transitions[0] == 0);  // Empty parentheses = no bits set
     }
@@ -375,8 +359,7 @@ TEST_SUITE("Day10 Tests") {
     TEST_CASE("parse_line_integer - with whitespace") {
         std::string_view input = "  [.##.]   (3)   (1,3)  {5,10}  ";
         auto state = parse_line_integer(input);
-        
-        CHECK(state.nr_digits == 4);
+
         REQUIRE(state.transitions.size() == 2);
         REQUIRE(state.final_values.size() == 2);
         CHECK(state.final_values[0] == 5);
@@ -387,7 +370,6 @@ TEST_SUITE("Day10 Tests") {
         std::string_view input = "[.#.#.#.#] (0,2,4,6)";
         auto state = parse_line_integer(input);
 
-        CHECK(state.nr_digits == 8);
         REQUIRE(state.transitions.size() == 1);
         CHECK(state.transitions[0] == 0b01010101);  // Bits 0, 2, 4, 6 set
     }
@@ -395,8 +377,7 @@ TEST_SUITE("Day10 Tests") {
     TEST_CASE("parse_line_integer - curly braces with single value") {
         std::string_view input = "[.##.] {42}";
         auto state = parse_line_integer(input);
-        
-        CHECK(state.nr_digits == 4);
+
         CHECK(state.transitions.empty());
         REQUIRE(state.final_values.size() == 1);
         CHECK(state.final_values[0] == 42);
@@ -405,8 +386,7 @@ TEST_SUITE("Day10 Tests") {
     TEST_CASE("parse_line_integer - curly braces with large values") {
         std::string_view input = "[.##.] {100,200,255}";
         auto state = parse_line_integer(input);
-        
-        CHECK(state.nr_digits == 4);
+
         REQUIRE(state.final_values.size() == 3);
         CHECK(state.final_values[0] == 100);
         CHECK(state.final_values[1] == 200);
@@ -423,9 +403,8 @@ TEST_SUITE("Day10 Tests") {
     TEST_CASE("parse_input_integer - single line") {
         std::string_view input = "[.##.] (3) (1,3) {5,7}";
         auto states = parse_input_integer(input);
-        
+
         REQUIRE(states.size() == 1);
-        CHECK(states[0].nr_digits == 4);
         CHECK(states[0].transitions.size() == 2);
         CHECK(states[0].final_values.size() == 2);
     }
@@ -437,20 +416,17 @@ TEST_SUITE("Day10 Tests") {
         REQUIRE(states.size() == 3);
         
         // First line
-        CHECK(states[0].nr_digits == 4);
         CHECK(states[0].transitions.size() == 1);
         CHECK(states[0].final_values.size() == 1);
         CHECK(states[0].final_values[0] == 5);
         
         // Second line
-        CHECK(states[1].nr_digits == 4);
         CHECK(states[1].transitions.size() == 1);
         CHECK(states[1].final_values.size() == 2);
         CHECK(states[1].final_values[0] == 10);
         CHECK(states[1].final_values[1] == 20);
         
         // Third line
-        CHECK(states[2].nr_digits == 4);
         CHECK(states[2].transitions.size() == 1);
         CHECK(states[2].final_values.size() == 3);
         CHECK(states[2].final_values[0] == 1);
@@ -471,7 +447,6 @@ TEST_SUITE("Day10 Tests") {
         auto states = parse_input_integer(input);
         
         REQUIRE(states.size() == 2);
-        CHECK(states[1].nr_digits == 4);
         CHECK(states[1].final_values[0] == 10);
     }
     
@@ -492,17 +467,14 @@ TEST_SUITE("Day10 Tests") {
         REQUIRE(states.size() == 3);
         
         // First line
-        CHECK(states[0].nr_digits == 4);
         CHECK(states[0].transitions.size() == 6);
         CHECK(states[0].final_values.size() == 4);
         
         // Second line
-        CHECK(states[1].nr_digits == 5);
         CHECK(states[1].transitions.size() == 5);
         CHECK(states[1].final_values.size() == 5);
-        
+
         // Third line
-        CHECK(states[2].nr_digits == 6);
         CHECK(states[2].transitions.size() == 4);
         CHECK(states[2].final_values.size() == 6);
     }
@@ -510,8 +482,55 @@ TEST_SUITE("Day10 Tests") {
     TEST_CASE("parse_input_integer - lines with only whitespace are skipped") {
         std::string_view input = "   \n\t\t\n[.##.] (3) {5}\n   \r\n";
         auto states = parse_input_integer(input);
-        
+
         REQUIRE(states.size() == 1);
-        CHECK(states[0].nr_digits == 4);
+    }
+
+    TEST_CASE("count_transition_bits - example from specification") {
+        // t1: 00100 = bit 2 set = 0b00100 = (1<<2) = 4
+        // t2: 11000 = bits 0,1 set = 0b00011 = (1<<0)|(1<<1) = 3
+        // t3: 10000 = bit 0 set = 0b00001 = (1<<0) = 1
+        // t4: 11111 = all bits set = 0b11111 = 31
+        std::vector<uint16_t> transitions = {4, 3, 1, 31};
+        std::vector<bool> states_used = {true, true, true, false};
+        size_t solution_length = 5;
+
+        auto result = count_transition_bits(transitions, states_used, solution_length);
+
+        REQUIRE(result.size() == 5);
+        CHECK(result[0] == 2);  // Bit 0: in t2 and t3
+        CHECK(result[1] == 1);  // Bit 1: in t2
+        CHECK(result[2] == 1);  // Bit 2: in t1
+        CHECK(result[3] == 0);  // Bit 3: not in any used transition
+        CHECK(result[4] == 0);  // Bit 4: not in any used transition
+    }
+
+    TEST_CASE("count_transition_bits - all transitions used") {
+        // All bits in different positions
+        std::vector<uint16_t> transitions = {0b0001, 0b0010, 0b0100, 0b1000};
+        std::vector<bool> states_used = {true, true, true, true};
+        size_t solution_length = 4;
+
+        auto result = count_transition_bits(transitions, states_used, solution_length);
+
+        REQUIRE(result.size() == 4);
+        CHECK(result[0] == 1);
+        CHECK(result[1] == 1);
+        CHECK(result[2] == 1);
+        CHECK(result[3] == 1);
+    }
+
+    TEST_CASE("count_transition_bits - no transitions used") {
+        std::vector<uint16_t> transitions = {0b1111, 0b1111, 0b1111};
+        std::vector<bool> states_used = {false, false, false};
+        size_t solution_length = 4;
+
+        auto result = count_transition_bits(transitions, states_used, solution_length);
+
+        REQUIRE(result.size() == 4);
+        CHECK(result[0] == 0);
+        CHECK(result[1] == 0);
+        CHECK(result[2] == 0);
+        CHECK(result[3] == 0);
     }
 }
