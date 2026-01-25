@@ -8,10 +8,11 @@
 #include <cmath>
 #include <queue>
 #include <algorithm>
-#include <iostream>
 
 namespace day10
 {
+    static const uint32_t LARGE_NUMBER = 1000000;
+
     struct BooleanState {
         size_t nr_digits = 0;
         uint16_t initial_state = {};
@@ -51,13 +52,7 @@ namespace day10
 
     // Count the number of true values in a boolean vector
     inline size_t nr_transitions_in_presses(const std::vector<bool>& states_used) {
-        size_t count = 0;
-        for (bool state : states_used) {
-            if (state) {
-                count++;
-            }
-        }
-        return count;
+        return std::count(states_used.begin(), states_used.end(), true);
     }
 
     // Count how many times each bit position is set across used transitions
@@ -75,7 +70,7 @@ namespace day10
         for (size_t i = 0; i < transitions.size() && i < states_used.size(); i++) {
             if (states_used[i]) {
                 uint16_t transition = transitions[i];
-                for (size_t bit = 0; bit < solution_length && bit < 16; bit++) {
+                for (size_t bit = 0; bit < solution_length; bit++) {
                     if (transition & (1 << bit)) {
                         result[bit]++;
                     }
@@ -92,30 +87,29 @@ namespace day10
     // If invalid, returns false and leaves counts_update unchanged
     inline bool subtract_and_update(std::vector<uint8_t>& counts_update, const std::vector<uint8_t>& target) {
         // Check if operation is valid
-        if (counts_update.size() != target.size()) {
+        if (counts_update.size() != target.size())
             return false;
-        }
 
         for (size_t i = 0; i < counts_update.size(); i++) {
-            if (counts_update[i] > target[i]) {
+            if (counts_update[i] > target[i])
                 return false;
-            }
         }
 
         // Perform subtraction in place
-        for (size_t i = 0; i < counts_update.size(); i++) {
+        for (size_t i = 0; i < counts_update.size(); i++)
             counts_update[i] = target[i] - counts_update[i];
-        }
 
         return true;
     }
 
     // Halve all values in a solution vector in place
     // Each element is divided by 2 (integer division)
-    inline void reduce_even_solution(std::vector<uint8_t>& solution) {
-        for (auto& val : solution) {
-            val /= 2;
-        }
+    inline std::vector<uint8_t> reduce_even_solution(const std::vector<uint8_t>& solution) {
+        std::vector<uint8_t> new_solution(solution.size(), 0);
+        for (size_t i = 0; i < solution.size(); i++)
+            new_solution[i] = solution[i] / 2;
+
+        return new_solution;
     }
 
     // Parse a single line of input and return a State object
@@ -416,7 +410,7 @@ namespace day10
         return states;
     }
 
-    uint32_t fewest_button_presses(std::string_view payload) {
+    inline uint32_t fewest_button_presses(std::string_view payload) {
         std::vector<BooleanState> states = parse_input_boolean(payload);
         uint32_t result = 0;
 
@@ -459,14 +453,72 @@ namespace day10
         return result;
     }
 
+    // ToDo - still has edge case failures
+    // ToDo - can take advantage of caching as transitions don't change
+    inline uint32_t fewest_presses_worker(const std::vector<uint8_t>& target,
+                                   const std::vector<uint16_t>& transitions) {
+        auto target_state = vector_to_odd_even_bitmask(target);
+
+        if (std::all_of(target.begin(), target.end(), [](uint8_t x) { return x == 0; })) {
+            return 0;
+        }
+
+        if (std::all_of(target.begin(), target.end(), [](uint8_t x) { return x%2 == 0; })) {
+            return 2 * fewest_presses_worker(reduce_even_solution(target), transitions);
+        }
+
+        std::vector<std::vector<bool>> candidates = {};
+
+        auto nr_transitions = transitions.size();
+        auto limit = uint16_t(1u << nr_transitions);
+        for (uint16_t i = 1; i < limit; i++) {
+            auto combination = extract_states_from_combination(i, nr_transitions);
+            auto hash = target_state;
+            for (size_t j = 0; j < nr_transitions; j++) {
+                if (combination[j])
+                    hash ^= transitions[j];
+            }
+
+            if (hash == 0)
+                candidates.push_back(combination);
+        }
+
+        if (candidates.size() == 0)
+            return day10::LARGE_NUMBER;
+
+        uint32_t fewest_moves = day10::LARGE_NUMBER;
+        for (auto& candidate: candidates) {
+            auto nr_transitions_used = nr_transitions_in_presses(candidate);
+            if (nr_transitions_used >= fewest_moves)
+                continue;
+
+            auto new_count = count_transition_bits(transitions, candidate, target.size());
+            auto count_valid = subtract_and_update(new_count, target); // new count updated in place
+            if (!count_valid)
+                continue;
+
+            new_count = reduce_even_solution(new_count);
+            nr_transitions_used += 2 * fewest_presses_worker(new_count, transitions);
+
+            if (nr_transitions_used < fewest_moves)
+                fewest_moves = nr_transitions_used;
+        }
+
+        return fewest_moves;
+    }
+
     // Find every solution in the solution space that can provide the odd and even numbers
     // in a configuation
     // In each case subtract that state from the final state which will be series of even
     // numbers, and then half the even numbers and solve the state recursively
     // until all numbers are 1 or 0
-    uint32_t fewest_presses_to_configuration(std::string_view payload) {
+    inline uint32_t fewest_presses_to_configuration(std::string_view payload) {
         std::vector<IntegerState> states = parse_input_integer(payload);
         uint32_t result = 0;
+
+        int i = 0;
+        for (auto& state : states)
+            result += fewest_presses_worker(state.final_values, state.transitions);;
 
         return result;
     }

@@ -22,11 +22,6 @@ int main() {
     std::string input = buffer.str();
     file.close();
 
-    // Run fewest_presses_to_configuration
-    std::cout << "Running fewest_presses_to_configuration on full input..." << std::endl;
-    uint32_t result = day10::fewest_presses_to_configuration(input);
-    std::cout << "Result: " << result << std::endl;
-
     std::cout << std::endl;
     std::cout << "Press Enter to exit...";
     std::cin.get();
