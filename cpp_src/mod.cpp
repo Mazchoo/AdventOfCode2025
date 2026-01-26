@@ -20,8 +20,16 @@
 #include "src/day08.hpp"
 #include "src/day09.hpp"
 #include "src/day10.hpp"
+#include "src/day11.hpp"
 
 extern "C" {
+    // Day11 pt 1
+    EXPORT_FUNC
+    uint32_t count_number_paths(const char* payload_ptr, int payload_len) {
+        std::string_view payload(payload_ptr, payload_len);
+        return day11::get_number_of_paths(payload);
+    }
+
     // Day10 pt 2
     EXPORT_FUNC
     uint32_t fewest_presses_to_configuration(const char* payload_ptr, int payload_len) {
