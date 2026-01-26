@@ -4,6 +4,25 @@
 using namespace day11;
 
 TEST_SUITE("Day11 Tests") {
+    TEST_CASE("get_number_of_paths_chain - sample from specification") {
+        std::string_view input = R"(svr: aaa bbb
+aaa: fft
+fft: ccc
+bbb: tty
+tty: ccc
+ccc: ddd eee
+ddd: hub
+hub: fff
+eee: dac
+dac: fff
+fff: ggg hhh
+ggg: out
+hhh: out)";
+
+        auto result = get_number_of_paths_in_chain(input);
+        CHECK(result == 2);
+    }
+
     TEST_CASE("get_number_of_paths - sample from specification") {
         std::string_view input = R"(aaa: you hhh
 you: bbb ccc
@@ -16,8 +35,26 @@ ggg: out
 hhh: ccc fff iii
 iii: out)";
 
-        auto result = get_number_of_paths(input);
+        auto result = get_number_of_paths_start_to_end(input);
         CHECK(result == 5);
+    }
+
+    TEST_CASE("get_number_of_paths - impossible path returns 0") {
+        std::string_view input = R"(aaa: you hhh
+you: bbb ccc
+bbb: ddd eee
+ccc: ddd eee fff
+ddd: ggg
+eee: out
+fff: out
+ggg: out
+hhh: ccc fff iii
+iii: out)";
+
+        auto graph = parse_graph(input);
+        auto result = get_number_of_paths(graph, "out", "you");
+
+        CHECK(result == 0);
     }
 
     TEST_CASE("parse_graph - simple graph") {
@@ -30,9 +67,6 @@ bbb: out)";
         CHECK(graph.nodes[0] == "aaa");
         CHECK(graph.nodes[1] == "bbb");
         CHECK(graph.nodes[2] == "out");
-
-        CHECK(graph.start_node_index == 0);  // "aaa" is start
-        CHECK(graph.end_node_index == 2);    // "out" is end
 
         REQUIRE(graph.edges.size() == 2);
         CHECK(graph.edges[0].from_index == 0);  // aaa -> bbb
@@ -55,26 +89,20 @@ iii: out)";
 
         auto graph = parse_graph(input);
 
-        // Should have 10 unique nodes
+        // Should have 11 unique nodes
         REQUIRE(graph.nodes.size() == 11);
 
-        // Check start and end nodes
-        bool found_start = false;
-        bool found_end = false;
+        // Check that expected nodes exist
+        bool found_you = false;
+        bool found_out = false;
         for (size_t i = 0; i < graph.nodes.size(); i++) {
-            if (graph.nodes[i] == "you") {
-                found_start = true;
-                CHECK(graph.start_node_index == i);
-            }
-            if (graph.nodes[i] == "out") {
-                found_end = true;
-                CHECK(graph.end_node_index == i);
-            }
+            if (graph.nodes[i] == "you") found_you = true;
+            if (graph.nodes[i] == "out") found_out = true;
         }
-        CHECK(found_start);
-        CHECK(found_end);
+        CHECK(found_you);
+        CHECK(found_out);
 
-        // Count edges - should be 20 total (sum of all outgoing edges)
+        // Count edges - should be 17 total (sum of all outgoing edges)
         // aaa: 2, you: 2, bbb: 2, ccc: 3, ddd: 1, eee: 1, fff: 1, ggg: 1, hhh: 3, iii: 1
         CHECK(graph.edges.size() == 17);
     }
@@ -164,8 +192,13 @@ ccc: out)";
         REQUIRE(graph.nodes.size() == 4);
         REQUIRE(graph.edges.size() == 3);
 
+        // Find "out" index
+        size_t out_index = 0;
+        for (size_t i = 0; i < graph.nodes.size(); i++) {
+            if (graph.nodes[i] == "out") out_index = i;
+        }
+
         // All edges should point to "out"
-        size_t out_index = graph.end_node_index;
         for (const auto& edge : graph.edges) {
             CHECK(edge.to_index == out_index);
         }
@@ -182,11 +215,12 @@ ccc: out)";
         REQUIRE(graph.edges.size() == 3);
 
         // Find indices
-        size_t aaa_idx = 0, bbb_idx = 0, ccc_idx = 0;
+        size_t aaa_idx = 0, bbb_idx = 0, ccc_idx = 0, out_idx = 0;
         for (size_t i = 0; i < graph.nodes.size(); i++) {
             if (graph.nodes[i] == "aaa") aaa_idx = i;
             if (graph.nodes[i] == "bbb") bbb_idx = i;
             if (graph.nodes[i] == "ccc") ccc_idx = i;
+            if (graph.nodes[i] == "out") out_idx = i;
         }
 
         // Verify edges exist with correct indices
@@ -194,7 +228,7 @@ ccc: out)";
         for (const auto& edge : graph.edges) {
             if (edge.from_index == aaa_idx && edge.to_index == bbb_idx) found_aaa_bbb = true;
             if (edge.from_index == bbb_idx && edge.to_index == ccc_idx) found_bbb_ccc = true;
-            if (edge.from_index == ccc_idx && edge.to_index == graph.end_node_index) found_ccc_out = true;
+            if (edge.from_index == ccc_idx && edge.to_index == out_idx) found_ccc_out = true;
         }
 
         CHECK(found_aaa_bbb);
@@ -221,30 +255,6 @@ bbb: out)";
         REQUIRE(graph.nodes.size() == 1);
         CHECK(graph.nodes[0] == "aaa");
         CHECK(graph.edges.empty());
-    }
-
-    TEST_CASE("parse_graph - start node detection prefers 'aaa'") {
-        std::string_view input = R"(you: bbb
-aaa: ccc
-bbb: out
-ccc: out)";
-
-        auto graph = parse_graph(input);
-
-        // Should find "aaa" or "you" as start
-        std::string start_node = graph.nodes[graph.start_node_index];
-        CHECK((start_node == "aaa" || start_node == "you"));
-    }
-
-    TEST_CASE("parse_graph - end node detection") {
-        std::string_view input = R"(aaa: out
-bbb: end)";
-
-        auto graph = parse_graph(input);
-
-        // Should find "out" or "end" as end node
-        std::string end_node = graph.nodes[graph.end_node_index];
-        CHECK((end_node == "out" || end_node == "end"));
     }
 
     TEST_CASE("parse_graph - complex graph with cycles") {

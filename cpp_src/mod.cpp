@@ -23,11 +23,18 @@
 #include "src/day11.hpp"
 
 extern "C" {
+    // Day11 pt 2
+    EXPORT_FUNC
+    uint64_t count_paths_in_chain(const char* payload_ptr, int payload_len) {
+        std::string_view payload(payload_ptr, payload_len);
+        return day11::get_number_of_paths_in_chain(payload);
+    }
+
     // Day11 pt 1
     EXPORT_FUNC
-    uint32_t count_number_paths(const char* payload_ptr, int payload_len) {
+    uint32_t count_paths_start_to_end(const char* payload_ptr, int payload_len) {
         std::string_view payload(payload_ptr, payload_len);
-        return day11::get_number_of_paths(payload);
+        return day11::get_number_of_paths_start_to_end(payload);
     }
 
     // Day10 pt 2

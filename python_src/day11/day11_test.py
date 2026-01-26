@@ -7,14 +7,15 @@ from python_src.common.call_advent_function import get_payload_result
 
 STORE, INSTANCE = load_wasm_module("./emcc_wasm/build/mod.wasm")
 
-count_number_paths = INSTANCE.exports(STORE)["count_number_paths"]
+count_paths_start_to_end = INSTANCE.exports(STORE)["count_paths_start_to_end"]
+count_paths_in_chain = INSTANCE.exports(STORE)["count_paths_in_chain"]
 
 
 def test_day11_pt1_sample():
     """Test get_payload_result(char*, int) -> uint32_t"""
 
     path = "./python_src/day11/input/sample.txt"
-    result = get_payload_result(path, STORE, INSTANCE, count_number_paths)
+    result = get_payload_result(path, STORE, INSTANCE, count_paths_start_to_end)
     assert result == 5
 
 
@@ -22,8 +23,24 @@ def test_day11_pt1():
     """Test get_payload_result(char*, int) -> uint32_t"""
 
     path = "./python_src/day11/input/full.txt"
-    result = get_payload_result(path, STORE, INSTANCE, count_number_paths)
+    result = get_payload_result(path, STORE, INSTANCE, count_paths_start_to_end)
     assert result == 788
+
+
+def test_day11_pt2_sample():
+    """Test get_payload_result(char*, int) -> uint32_t"""
+
+    path = "./python_src/day11/input/sample2.txt"
+    result = get_payload_result(path, STORE, INSTANCE, count_paths_in_chain)
+    assert result == 2
+
+
+def test_day11_pt2():
+    """Test get_payload_result(char*, int) -> uint32_t"""
+
+    path = "./python_src/day11/input/full.txt"
+    result = get_payload_result(path, STORE, INSTANCE, count_paths_in_chain)
+    assert result == 316291887968000
 
 
 if __name__ == "__main__":

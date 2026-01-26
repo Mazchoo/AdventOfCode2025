@@ -19,15 +19,13 @@ namespace day11
 
     struct Graph {
         std::vector<std::string> nodes;
-        size_t start_node_index;
-        size_t end_node_index;
         std::vector<Edge> edges;
     };
 
     // Parse a directed graph from the input format:
     // node_name: neighbor1 neighbor2 neighbor3
-    // Returns a Graph structure with nodes, start_node_index, end_node_index, and directed edges
-    Graph parse_graph(std::string_view payload) {
+    // Returns a Graph structure with nodes and directed edges
+    inline Graph parse_graph(std::string_view payload) {
         Graph graph;
         std::unordered_map<std::string, size_t> node_to_index;
 
@@ -112,26 +110,11 @@ namespace day11
             }
         }
 
-        // Determine start and end nodes
-        // Start node is typically the first node in the input or a special name like "aaa" or "you"
-        // End node is typically "out" or similar
-        graph.start_node_index = 0;
-        graph.end_node_index = 0;
-
-        for (size_t i = 0; i < graph.nodes.size(); i++) {
-            if (graph.nodes[i] == "aaa" || graph.nodes[i] == "you") {
-                graph.start_node_index = i;
-            }
-            if (graph.nodes[i] == "out" || graph.nodes[i] == "end") {
-                graph.end_node_index = i;
-            }
-        }
-
         return graph;
     }
 
     // Get direct descendants of a node (immediate children - one edge away)
-    std::vector<size_t> get_direct_descendants(const Graph& graph, size_t node_index) {
+    inline std::vector<size_t> get_direct_descendants(const Graph& graph, size_t node_index) {
         std::vector<size_t> descendants;
         for (const auto& edge : graph.edges) {
             if (edge.from_index == node_index) {
@@ -142,7 +125,7 @@ namespace day11
     }
 
     // Get direct ancestors of a node (immediate parents - one edge away)
-    std::vector<size_t> get_direct_ancestors(const Graph& graph, size_t node_index) {
+    inline std::vector<size_t> get_direct_ancestors(const Graph& graph, size_t node_index) {
         std::vector<size_t> ancestors;
         for (const auto& edge : graph.edges) {
             if (edge.to_index == node_index) {
@@ -153,7 +136,7 @@ namespace day11
     }
 
     // Get all descendants of a node (nodes reachable by following edges forward)
-    std::vector<size_t> get_all_descendants(const Graph& graph, size_t node_index) {
+    inline std::vector<size_t> get_all_descendants(const Graph& graph, size_t node_index) {
         std::vector<size_t> descendants;
         std::vector<bool> visited(graph.nodes.size(), false);
         std::vector<size_t> queue;
@@ -183,27 +166,40 @@ namespace day11
         return descendants;
     }
 
-    uint32_t get_number_of_paths(std::string_view payload) {
-        Graph graph = parse_graph(payload);
-        std::vector<uint32_t> number_paths(graph.nodes.size(), 0);
-        number_paths[graph.start_node_index] = 1;
+    inline uint32_t get_number_of_paths(const Graph& graph, const std::string& start_name, const std::string& end_name) {
+        // Find start and end node indices by name
+        size_t start_node_index = 0;
+        size_t end_node_index = 0;
+        for (size_t i = 0; i < graph.nodes.size(); i++) {
+            if (graph.nodes[i] == start_name) {
+                start_node_index = i;
+            }
+            if (graph.nodes[i] == end_name) {
+                end_node_index = i;
+            }
+        }
 
         std::vector<bool> green(graph.nodes.size(), false);
 
-        std::vector<size_t> candidates = {};
-        std::vector<size_t> new_candidates = {graph.start_node_index};
-        std::vector<size_t> working_candidates = {};
-
-        auto descendents = get_all_descendants(graph, graph.start_node_index);
+        auto descendents = get_all_descendants(graph, start_node_index);
+        if (std::find(descendents.begin(), descendents.end(), end_node_index) == descendents.end())
+            return 0;
 
         for (size_t i = 0; i < graph.nodes.size(); i++) {
-            if (std::find(descendents.begin(), descendents.end(), i) == descendents.end() && i != graph.start_node_index) {
+            if (std::find(descendents.begin(), descendents.end(), i) == descendents.end() && i != start_node_index) {
                 green[i] = true;
             }
         }
 
+        std::vector<uint32_t> number_paths(graph.nodes.size(), 0);
+        number_paths[start_node_index] = 1;
+
+        std::vector<size_t> candidates = {};
+        std::vector<size_t> new_candidates = {start_node_index};
+        std::vector<size_t> working_candidates = {};
+
         int i = 0;
-        while (i++ < MAX_ITERATIONS && !green[graph.end_node_index]) {
+        while (i++ < MAX_ITERATIONS && !green[end_node_index]) {
 
             for (auto& candidate: new_candidates) {
                 auto decendents = get_direct_descendants(graph, candidate);
@@ -260,6 +256,30 @@ namespace day11
             working_candidates.clear();
         }
 
-        return number_paths[graph.end_node_index];
+        return number_paths[end_node_index];
+    }
+
+    inline uint32_t get_number_of_paths_start_to_end(std::string_view payload) {
+        Graph graph = parse_graph(payload);
+        return get_number_of_paths(graph, "you", "out");
+    }
+
+    inline uint64_t get_number_of_paths_in_chain(std::string_view payload) {
+        Graph graph = parse_graph(payload);
+        uint64_t total_paths = 1;
+        auto fft_to_dac = get_number_of_paths(graph, "fft", "dac");
+        auto dac_to_fft = get_number_of_paths(graph, "dac", "fft");
+
+        if (fft_to_dac > 0) {
+            total_paths *= fft_to_dac;
+            total_paths *= get_number_of_paths(graph, "svr", "fft");
+            total_paths *= get_number_of_paths(graph, "dac", "out");
+        } else {
+            total_paths *= dac_to_fft;
+            total_paths *= get_number_of_paths(graph, "svr", "dac");
+            total_paths *= get_number_of_paths(graph, "fft", "out");
+        }
+
+        return total_paths;
     }
 }
